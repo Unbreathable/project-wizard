@@ -16,6 +16,10 @@ func PostRequestURL(url string, body interface{}) (Map, error) {
 	return PostRequestWithHeaders[Map](url, body, Headers{})
 }
 
+func PostRequestURLGeneric[T any](url string, body interface{}) (T, error) {
+	return PostRequestWithHeaders[T](url, body, Headers{})
+}
+
 func PostRequestWithHeaders[T any](url string, body interface{}, headers Headers) (T, error) {
 	// Declared here so it can be returned as nil before it's actually used
 	var data T

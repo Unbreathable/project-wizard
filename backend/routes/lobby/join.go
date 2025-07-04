@@ -8,19 +8,19 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type LobbyCreateRequest struct {
-	Name string `json:"name" validate:"required"`
+type LobbyJoinRequest struct {
+	LobbyId string `json:"lobby_id" validate:"required"`
+	Name    string `json:"name" validate:"required"`
 }
 
-type LobbyCreateResponse struct {
+type LobbyJoinResponse struct {
 	Success  bool   `json:"success"`
-	LobbyId  string `json:"lobby_id"`
 	PlayerId string `json:"player_id"`
 }
 
-// Route: /lobby/create
-func createLobby(c *fiber.Ctx) error {
-	var req LobbyCreateRequest
+// Route: /lobby/join
+func joinLobby(c *fiber.Ctx) error {
+	var req LobbyJoinRequest
 	if err := c.BodyParser(&req); err != nil {
 		return integration.InvalidRequest(c, "request is invalid")
 	}
@@ -32,11 +32,19 @@ func createLobby(c *fiber.Ctx) error {
 		return integration.InvalidRequest(c, "request format is invalid")
 	}
 
-	lobbyId, playerId := service.CreateLobby(req.Name)
+	lobby, ok := service.GetLobby(req.LobbyId)
+	if !ok {
+		return integration.InvalidRequest(c, "invalid id")
+	}
 
-	return c.JSON(LobbyCreateResponse{
+	if lobby.IsFull() {
+		return integration.InvalidRequest(c, "lobby is full")
+	}
+
+	lobby.SetNamePlayer2(req.Name)
+
+	return c.JSON(LobbyJoinResponse{
 		Success:  true,
-		LobbyId:  lobbyId,
-		PlayerId: playerId,
+		PlayerId: lobby.GetPlayer2().ID,
 	})
 }
