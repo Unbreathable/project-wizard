@@ -1,1 +1,21 @@
 @import 'tailwindcss';
+
+@font-face {
+  font-family: 'Pixel';
+  src: url('/font.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@theme {
+  --color-bg-800: #131313;
+  --color-bg-700: #1b1b1b;
+  --color-bg-600: #272727;
+  --color-bg-500: #3d3d3d;
+  --color-bg-400: #5d5d5d;
+  --color-bg-300: #858585;
+  --color-bg-200: #b4b4b4;
+  --color-bg-100: #ffffff;
+  
+  --font-pixel: 'Pixel', sans-serif;
+}

@@ -7,7 +7,7 @@ import (
 )
 
 type LobbyCreateRequest struct {
-	Name string `json:"name"`
+	Name string `json:"name" validate:"required"`
 }
 
 type LobbyCreateResponse struct {
@@ -21,6 +21,9 @@ func createLobby(c *fiber.Ctx) error {
 	var req LobbyCreateRequest
 	if err := c.BodyParser(&req); err != nil {
 		return integration.InvalidRequest(c, "request is invalid")
+	}
+	if err := service.Validate.Struct(req); err != nil {
+		return integration.InvalidRequest(c, "request format is invalid")
 	}
 
 	lobbyId, playerId := service.CreateLobby(req.Name)
