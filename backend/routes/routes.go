@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	lobby_routes "github.com/Liphium/project-wizard/backend/routes/lobby"
 	"github.com/Liphium/project-wizard/backend/service"
 	"github.com/Liphium/project-wizard/neogate"
 	"github.com/gofiber/fiber/v2"
@@ -11,7 +12,12 @@ import (
 
 func SetupRoutes(router fiber.Router) {
 
+	// neogate
 	router.Route("/gateway", setupNeo)
+
+	// lobby routes
+	router.Route("/lobby", lobby_routes.LobbyRoutes)
+
 }
 
 // Setup neogate
