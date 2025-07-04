@@ -8,7 +8,6 @@ import (
 )
 
 // Route: /lobby/create
-
 func createLobby(c *fiber.Ctx) error {
 	log.Println("crate lobby")
 	return integration.SuccessfulRequest(c)

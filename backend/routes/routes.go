@@ -17,7 +17,6 @@ func SetupRoutes(router fiber.Router) {
 
 	// lobby routes
 	router.Route("/lobby", lobby_routes.LobbyRoutes)
-
 }
 
 // Setup neogate
