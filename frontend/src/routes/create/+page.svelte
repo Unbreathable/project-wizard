@@ -1,23 +1,14 @@
 <script lang="ts">
-	import { joinSession } from '$lib/connection.svelte';
+	import { createSession } from '$lib/connection.svelte';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
 
 	let name = $state('');
 	let error = $state('');
 	let isLoading = $state(false);
 
-	// Get lobby ID from URL params
-	const lobbyId = $page.url.searchParams.get('lobby_id') || '';
-
-	async function handleJoin() {
-		if (!name.trim()) {
+	async function handleCreate() {
+		if (!name.trim() || name.length < 2) {
 			error = 'Please enter your name!';
-			return;
-		}
-
-		if (!lobbyId) {
-			error = 'No lobby ID provided!';
 			return;
 		}
 
@@ -25,7 +16,7 @@
 		error = '';
 
 		try {
-			const result = await joinSession(lobbyId, name.trim());
+			const result = await createSession(name.trim());
 
 			if (result) {
 				// Error occurred
@@ -43,7 +34,7 @@
 
 	function handleKeyPress(event: KeyboardEvent) {
 		if (event.key === 'Enter') {
-			handleJoin();
+			handleCreate();
 		}
 	}
 </script>
@@ -52,7 +43,7 @@
 	<div
 		class="flex flex-col p-6 gap-4 border-6 border-double border-bg-200 bg-bg-700 w-full max-w-md"
 	>
-		<h1 class="text-bg-100 text-center font-pixel text-xl mb-2">JOIN GAME</h1>
+		<h1 class="text-bg-100 text-center font-pixel text-xl mb-2">CREATE GAME</h1>
 		<input
 			type="text"
 			maxlength="20"
@@ -68,11 +59,11 @@
 			</p>
 		{/if}
 		<button
-			onclick={handleJoin}
+			onclick={handleCreate}
 			disabled={isLoading}
 			class="text-bg-100 border-2 border-bg-300 bg-bg-600 outline-none font-pixel w-full p-4 mb-1 transition-all duration-150 ease-out shadow-[0px_4px_0px_0px_var(--color-bg-300)] cursor-pointer hover:-translate-y-1 hover:shadow-[0px_8px_0px_0px_var(--color-bg-300)] active:translate-y-1 active:shadow-[0px_0px_0px_0px_var(--color-bg-300)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-[0px_4px_0px_0px_var(--color-bg-300)]"
 		>
-			{isLoading ? '>> CONNECTING <<' : '>> CONNECT <<'}
+			{isLoading ? '>> CREATING <<' : '>> CREATE <<'}
 		</button>
 	</div>
 </div>

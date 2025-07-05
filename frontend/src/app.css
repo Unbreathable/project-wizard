@@ -16,6 +16,8 @@
   --color-bg-300: #858585;
   --color-bg-200: #b4b4b4;
   --color-bg-100: #ffffff;
+
+  --color-error: #f5555d;
   
   --font-pixel: 'Pixel', sans-serif;
 }
