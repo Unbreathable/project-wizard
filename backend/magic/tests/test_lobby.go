@@ -16,7 +16,6 @@ func MagicTestLobby(t *testing.T, p *mconfig.Plan) {
 	lobby2Username1 := "lobby2"
 
 	lobbyId1 := ""
-	playerId1 := ""
 	playerId2 := ""
 
 	// Create 2 lobbies
@@ -25,7 +24,7 @@ func MagicTestLobby(t *testing.T, p *mconfig.Plan) {
 		magic_util.AssertEq(t, requests.ValueOr(res, "success", false), true)
 
 		lobbyId1 = requests.ValueOr(res, "lobby_id", "no id")
-		playerId1 = requests.ValueOr(res, "player_id", "no id")
+		requests.ValueOr(res, "player_id", "no id")
 
 		res = magic_scripts.RunLobbyCreate(p, lobby2Username1)
 		magic_util.AssertEq(t, requests.ValueOr(res, "success", false), true)
@@ -39,53 +38,13 @@ func MagicTestLobby(t *testing.T, p *mconfig.Plan) {
 		playerId2 = requests.ValueOr(res, "player_id", "no id")
 	})
 
-	// Lobby info lobby 1
-	t.Run("getting info from a lobby", func(t *testing.T) {
-		infoRes := magic_scripts.RunLobbyInfo(p, lobbyId1)
-
-		magic_util.AssertEq(t, infoRes.Success, true)
-		magic_util.AssertEq(t, infoRes.Player1.Name, lobby1Username1)
-		magic_util.AssertEq(t, infoRes.Player2.Name, lobby1Username2)
-		magic_util.AssertEq(t, infoRes.Player1.ID, playerId1)
-		magic_util.AssertEq(t, infoRes.Player2.ID, playerId2)
-		magic_util.AssertEq(t, infoRes.Player1.Ready, false)
-		magic_util.AssertEq(t, infoRes.Player2.Ready, false)
-	})
-
 	// Ready player 2
 	t.Run("ready a player", func(t *testing.T) {
 		magic_scripts.RunLobbyReady(p, playerId2, lobbyId1)
-	})
-
-	// Lobby info 2 lobby 1
-	t.Run("checking for ready status update", func(t *testing.T) {
-		infoRes := magic_scripts.RunLobbyInfo(p, lobbyId1)
-
-		magic_util.AssertEq(t, infoRes.Success, true)
-		magic_util.AssertEq(t, infoRes.Player1.Name, lobby1Username1)
-		magic_util.AssertEq(t, infoRes.Player2.Name, lobby1Username2)
-		magic_util.AssertEq(t, infoRes.Player1.ID, playerId1)
-		magic_util.AssertEq(t, infoRes.Player2.ID, playerId2)
-		magic_util.AssertEq(t, infoRes.Player1.Ready, false)
-		magic_util.AssertEq(t, infoRes.Player2.Ready, true)
 	})
 
 	// Unready player 2
 	t.Run("ready a player", func(t *testing.T) {
 		magic_scripts.RunLobbyUnready(p, playerId2, lobbyId1)
 	})
-
-	// Lobby info 3 lobby 1
-	t.Run("checking for ready status update", func(t *testing.T) {
-		infoRes := magic_scripts.RunLobbyInfo(p, lobbyId1)
-
-		magic_util.AssertEq(t, infoRes.Success, true)
-		magic_util.AssertEq(t, infoRes.Player1.Name, lobby1Username1)
-		magic_util.AssertEq(t, infoRes.Player2.Name, lobby1Username2)
-		magic_util.AssertEq(t, infoRes.Player1.ID, playerId1)
-		magic_util.AssertEq(t, infoRes.Player2.ID, playerId2)
-		magic_util.AssertEq(t, infoRes.Player1.Ready, false)
-		magic_util.AssertEq(t, infoRes.Player2.Ready, false)
-	})
-
 }

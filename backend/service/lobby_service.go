@@ -122,5 +122,7 @@ func (lobby *Lobby) StartGame() {
 		},
 	}
 
-	// TODO: send game start event
+	// Send game start event
+	Instance.SendOne(lobby.GetPlayerTokenById(lobby.playersId[0]), GameStartEvent())
+	Instance.SendOne(lobby.GetPlayerTokenById(lobby.playersId[1]), GameStartEvent())
 }

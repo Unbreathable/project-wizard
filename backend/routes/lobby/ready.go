@@ -63,6 +63,14 @@ func readyLobby(c *fiber.Ctx) error {
 	if err != nil {
 		return integration.InvalidRequest(c, "server error")
 	}
+
+	// Send lobby join event to players
+	data, err := getLobbyInfo(req.LobbyId)
+	if err != nil {
+		return integration.InvalidRequest(c, err.Error())
+	}
+	service.Instance.Send([]string{p1.Token, p2.Token}, LobbyChangeEvent(data))
+
 	if p1.Ready && p2.Ready {
 		// TODO: start game
 	}

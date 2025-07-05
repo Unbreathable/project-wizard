@@ -50,6 +50,18 @@ func joinLobby(c *fiber.Ctx) error {
 		return integration.InvalidRequest(c, "server error")
 	}
 
+	p1, err := lobby.GetPlayer(1)
+	if err != nil {
+		return integration.InvalidRequest(c, "server error")
+	}
+
+	// Send lobby join event to host
+	data, err := getLobbyInfo(req.LobbyId)
+	if err != nil {
+		return integration.InvalidRequest(c, err.Error())
+	}
+	service.Instance.SendOne(p1.Token, LobbyChangeEvent(data))
+
 	return c.JSON(LobbyJoinResponse{
 		Success:  true,
 		PlayerId: p2.ID,

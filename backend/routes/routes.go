@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"encoding/json"
 	"log"
 	"os"
 
@@ -10,6 +11,11 @@ import (
 	"github.com/Liphium/project-wizard/neogate"
 	"github.com/gofiber/fiber/v2"
 )
+
+type NeogateTokenAttachment struct {
+	PlayerId string `json:"player_id"`
+	LobbyId  string `json:"lobby_id"`
+}
 
 func SetupRoutes(router fiber.Router) {
 
@@ -58,6 +64,21 @@ func setupNeo(router fiber.Router) {
 				Account: token,
 				Session: attachments,
 			}
+
+			var neoAtt NeogateTokenAttachment
+			err := json.Unmarshal([]byte(attachments), &neoAtt)
+			if err != nil {
+				return clientInfo, false
+			}
+
+			lobby, ok := service.GetLobby(neoAtt.LobbyId)
+			if !ok {
+				return clientInfo, false
+			}
+			if lobby.GetPlayerTokenById(neoAtt.PlayerId) != token {
+				return clientInfo, false
+			}
+
 			return clientInfo, true
 		},
 
