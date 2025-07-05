@@ -11,6 +11,10 @@ type Character struct {
 	StatusEffects []StatusEffect
 }
 
+func (c *Character) IsDead() bool {
+	return c.Health < 0
+}
+
 func (c *Character) RelatedPlayer() *GamePlayer {
 	return c.relatedPlayer
 }
