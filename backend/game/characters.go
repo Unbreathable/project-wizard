@@ -12,7 +12,7 @@ func newCharacter(id uint, characterFun func(uint, *GamePlayer) Character) func(
 }
 
 type Character struct {
-	relatedPlayer *GamePlayer
+	relatedPlayer *GamePlayer    `json:"-"`
 	ID            uint           `json:"id"` // Character id (unique for every character)
 	Name          string         `json:"name"`
 	Origin        string         `json:"origin"` // Which anime, game or whereever they came from
