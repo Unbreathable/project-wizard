@@ -1,8 +1,14 @@
 package game
 
 // All characters (ID -> Creation Function)
-var CharacterRegistry = map[uint]func(uint, *GamePlayer) Character{
-	0: NewChisato,
+var CharacterRegistry = map[uint]func(*GamePlayer) Character{
+	1: newCharacter(1, NewChisato),
+}
+
+func newCharacter(id uint, characterFun func(uint, *GamePlayer) Character) func(*GamePlayer) Character {
+	return func(gp *GamePlayer) Character {
+		return characterFun(id, gp)
+	}
 }
 
 type Character struct {

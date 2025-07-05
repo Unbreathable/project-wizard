@@ -1,6 +1,7 @@
 package game_routes
 
 import (
+	"github.com/Liphium/project-wizard/backend/game"
 	"github.com/Liphium/project-wizard/backend/integration"
 	"github.com/Liphium/project-wizard/backend/service"
 	"github.com/gofiber/fiber/v2"
@@ -11,8 +12,8 @@ type GameRemoveTurnRequest struct {
 	PlayerId string `json:"player_id" validate:"required"`
 	Token    string `json:"token" validate:"required"`
 
-	TurnActions []service.GameAction `json:"turn_actions" validate:"required"`
-	TurnSwap    []int                `json:"turn_swap" validate:"required"`
+	TurnActions []game.GameAction `json:"turn_actions" validate:"required"`
+	TurnSwap    []int             `json:"turn_swap" validate:"required"`
 }
 
 // Route: /game/remove_turn

@@ -54,7 +54,6 @@ func RunSimulation(players []*GamePlayer, actions map[string][]GameAction) error
 		}
 	}
 
-	// Prepare all the actions
 	return nil
 }
 
