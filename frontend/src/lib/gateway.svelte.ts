@@ -8,7 +8,8 @@ export interface Event {
 
 export class Gateway {
     private socket: WebSocket | null = null;
-    private eventHandlers = new Map<string, Set<(event: Event) => void>>();
+    private eventQueue: Event[] = [];
+    private eventHandlers = new Map<string, (event: Event) => void>();
 
     private constructor() {}
 
@@ -47,27 +48,32 @@ export class Gateway {
     }
 
     private notifyHandlers(event: Event): void {
-        const handlers = this.eventHandlers.get(event.name);
-        if (handlers) {
-            handlers.forEach(handler => handler(event));
+        const handler = this.eventHandlers.get(event.name);
+        if (handler) {
+            handler(event);
+        } else {
+            this.eventQueue.push(event);
         }
     }
 
-    addEventHandler(eventName: string, handler: (event: Event) => void): () => void {
-        if (!this.eventHandlers.has(eventName)) {
-            this.eventHandlers.set(eventName, new Set());
+    setEventHandler(eventName: string, handler: (event: Event) => void): () => void {
+        this.eventHandlers.set(eventName, handler);
+        
+        // Process all queued events for this event name
+        const remainingEvents: Event[] = [];
+        while (this.eventQueue.length > 0) {
+            const event = this.eventQueue.shift()!;
+            if (event.name === eventName) {
+                handler(event);
+            } else {
+                remainingEvents.push(event);
+            }
         }
-        this.eventHandlers.get(eventName)!.add(handler);
+        this.eventQueue = remainingEvents;
 
         // Return cleanup function
         return () => {
-            const handlers = this.eventHandlers.get(eventName);
-            if (handlers) {
-                handlers.delete(handler);
-                if (handlers.size === 0) {
-                    this.eventHandlers.delete(eventName);
-                }
-            }
+            this.eventHandlers.delete(eventName);
         };
     }
 
@@ -76,6 +82,8 @@ export class Gateway {
             this.socket.close();
             this.socket = null;
         }
+        this.eventQueue = [];
+        this.eventHandlers.clear();
     }
 
     private send(data: any): void {

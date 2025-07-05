@@ -3,6 +3,9 @@ import { Gateway } from "./gateway.svelte";
 import { getServerUrl } from "./index";
 import { postRequestURL } from "./requests";
 
+export let currentLobby: string | undefined = undefined;
+export let currentPlayer: string | undefined = undefined;
+
 let currentGate: Gateway | null = null;
 
 /**
@@ -27,6 +30,8 @@ export async function joinSession(lobbyId: string, name: string): Promise<string
             "lobby_id": lobbyId,
             "player_id": response.player_id,
         }));
+        currentLobby = lobbyId;
+        currentPlayer = response.player_id;
         
         return undefined;
     } catch (error) {
@@ -53,6 +58,8 @@ export async function createSession(name: string): Promise<string | undefined> {
             "lobby_id": response.lobby_id,
             "player_id": response.player_id,
         }));
+        currentLobby = response.lobby_id;
+        currentPlayer = response.player_id;
         
         return undefined;
     } catch (error) {
@@ -68,7 +75,7 @@ export async function createSession(name: string): Promise<string | undefined> {
 export function useEvent(eventName: string, handler: (event: Event) => void): void {
     if (!currentGate) return;
     
-    const cleanup = currentGate.addEventHandler(eventName, handler);
+    const cleanup = currentGate.setEventHandler(eventName, handler);
     
     $effect(() => {
         return cleanup;

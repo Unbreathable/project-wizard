@@ -10,7 +10,7 @@
 		</p>
 		<button
 			class="text-bg-100 border-2 border-bg-300 bg-bg-600 outline-none font-pixel w-full p-4 mb-1 transition-all duration-150 ease-out shadow-[0px_4px_0px_0px_var(--color-bg-300)] cursor-pointer hover:-translate-y-1 hover:shadow-[0px_8px_0px_0px_var(--color-bg-300)] active:translate-y-1 active:shadow-[0px_0px_0px_0px_var(--color-bg-300)]"
-			onclick={() => goto('/create')}
+			onclick={() => goto('/lobby/create')}
 		>
 			&gt;&gt; CREATE GAME &lt;&lt;
 		</button>

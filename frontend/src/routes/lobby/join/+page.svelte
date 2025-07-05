@@ -28,11 +28,9 @@
 			const result = await joinSession(lobbyId, name.trim());
 
 			if (result) {
-				// Error occurred
 				error = result;
 			} else {
-				// Success - redirect to game
-				goto('/game');
+				goto('/lobby/select');
 			}
 		} catch (err) {
 			error = 'An unexpected error occurred';
