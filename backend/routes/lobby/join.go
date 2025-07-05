@@ -38,7 +38,7 @@ func joinLobby(c *fiber.Ctx) error {
 		return integration.InvalidRequest(c, "invalid id")
 	}
 
-	if lobby.IsFull() {
+	if lobby.IsFull() || lobby.IsRunning() {
 		return integration.InvalidRequest(c, "lobby is full")
 	}
 
