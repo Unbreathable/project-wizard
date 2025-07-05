@@ -10,6 +10,7 @@ const (
 	ElementEarth Element = "earth"
 	ElementDark  Element = "dark"
 	ElementLight Element = "light"
+	ElementNone  Element = "none"
 )
 
 func (e Element) Ptr() *Element {

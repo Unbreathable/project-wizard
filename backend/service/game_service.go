@@ -112,5 +112,41 @@ func (g *Game) VerifyPlayerActions(playerId string, actions []game.GameAction, s
 	}
 
 	return true
+}
 
+func (g *Game) StartTurn() {
+	p1, err := g.relatedLobby.GetPlayer(1)
+	p2, err := g.relatedLobby.GetPlayer(2)
+	err = game.RunSimulation([]*game.GamePlayer{p1.GamePlayer, p2.GamePlayer}, g.playerActions, g.playerSwaps)
+	if err != nil {
+		// TODO: error handling
+	}
+
+	charsP1 := []game.Character{}
+	for _, c := range p1.GamePlayer.Characters {
+		charsP1 = append(charsP1, *c)
+	}
+
+	charsP2 := []game.Character{}
+	for _, c := range p2.GamePlayer.Characters {
+		charsP2 = append(charsP2, *c)
+	}
+
+	// Send result of turn to clients
+	Instance.Send([]string{p1.Token, p2.Token}, GameUpdateEvent(SimulationResultEvent{
+		Swaps:   g.playerSwaps,
+		Actions: g.playerActions,
+		Result: map[string]SimulationResult{
+			p1.ID: {
+				Mana:       p1.GamePlayer.Mana,
+				ID:         p1.ID,
+				Characters: charsP1,
+			},
+			p2.ID: {
+				Mana:       p2.GamePlayer.Mana,
+				ID:         p2.ID,
+				Characters: charsP2,
+			},
+		},
+	}))
 }

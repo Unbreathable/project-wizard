@@ -1,13 +1,13 @@
 package game
 
 type Action struct {
-	ID          uint // Per character
-	Name        string
-	Description string
-	Element     *Element // Element of the action (may be nil)
-	Damage      int      // The damage it deals
-	ManaCost    int      // The mana it costs to cast
-	Oversight   bool     // If the action is allowed to be executed from characters other than the one attached to
+	ID          uint    `json:"id"` // Per character
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Element     Element `json:"element"`   // Element of the action (may be nil)
+	Damage      int     `json:"damage"`    // The damage it deals
+	ManaCost    int     `json:"mana_cost"` // The mana it costs to cast
+	Oversight   bool    `json:"oversight"` // If the action is allowed to be executed from characters other than the one attached to
 
 	// For easier time coding simulation
 	originCharacter *Character
@@ -19,7 +19,7 @@ type Action struct {
 }
 
 // Create a new action that deals damage on execution.
-func NewDamageAction(id uint, name string, description string, damage int, element *Element) Action {
+func NewDamageAction(id uint, name string, description string, damage int, element Element) Action {
 	return Action{
 		ID:          id,
 		Name:        name,

@@ -11,11 +11,16 @@ type GameAction struct {
 	Slot        int    `json:"slot" validate:"required"`   // Targetted slot id
 }
 
-func RunSimulation(players []*GamePlayer, actions map[string][]GameAction) error {
+func RunSimulation(players []*GamePlayer, actions map[string][]GameAction, swaps map[string][]int) error {
 
 	// Convert all the actions made by the player to actual actions from characters
 	actionsToExecute := map[string][]*Action{}
 	for _, player := range players {
+
+		// Swap characters
+		player.Characters[swaps[player.ID][0]], player.Characters[swaps[player.ID][1]] = player.Characters[swaps[player.ID][1]], player.Characters[swaps[player.ID][0]]
+
+		// Calculate actions
 		for _, action := range actions[player.ID] {
 			var character *Character = nil
 			var actionToExecute *Action = nil

@@ -13,13 +13,13 @@ func newCharacter(id uint, characterFun func(uint, *GamePlayer) Character) func(
 
 type Character struct {
 	relatedPlayer *GamePlayer
-	ID            uint // Character id (unique for every character)
-	Name          string
-	Origin        string // Which anime, game or whereever they came from
-	Elements      []Element
-	Health        int
-	Actions       []Action
-	StatusEffects []StatusEffect
+	ID            uint           `json:"id"` // Character id (unique for every character)
+	Name          string         `json:"name"`
+	Origin        string         `json:"origin"` // Which anime, game or whereever they came from
+	Elements      []Element      `json:"elements"`
+	Health        int            `json:"health"`
+	Actions       []Action       `json:"actions"`
+	StatusEffects []StatusEffect `json:"status_effects"`
 }
 
 func (c *Character) IsDead() bool {

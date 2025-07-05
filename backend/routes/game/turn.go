@@ -58,5 +58,10 @@ func turnGame(c *fiber.Ctx) error {
 	// Ready player
 	game.SetPlayerReady(req.PlayerId, true)
 
+	// Check if both player have locked in their turns
+	if game.IsReady() {
+		game.StartTurn()
+	}
+
 	return integration.SuccessfulRequest(c)
 }
