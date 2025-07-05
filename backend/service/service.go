@@ -33,10 +33,13 @@ func GameStartEvent(data map[string][]game.Character) neogate.Event {
 }
 
 // Event for game infos
-func GameInfoEvent() neogate.Event {
+func GameInfoEvent(p1Ready bool, p2Ready bool) neogate.Event {
 	return neogate.Event{
 		Name: "game_info",
-		Data: fiber.Map{}, // TODO: return info
+		Data: fiber.Map{
+			"player1_ready": p1Ready,
+			"player2_ready": p2Ready,
+		},
 	}
 }
 
