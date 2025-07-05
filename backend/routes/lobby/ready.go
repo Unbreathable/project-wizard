@@ -41,11 +41,26 @@ func readyLobby(c *fiber.Ctx) error {
 	if hasDuplicates(req.Characters) {
 		return integration.InvalidRequest(c, "bad character selection")
 	}
+
+	//create game player
+	gp, err := lobby.SetGamePlayerById(req.PlayerId)
+	if err != nil {
+		return integration.InvalidRequest(c, "server error")
+	}
+
+	// Check the validity of characters and safe the pointers
+	ptrChars := []*game.Character{}
 	for _, char := range req.Characters {
-		if _, ok := game.CharacterRegistry[char]; !ok {
+		createFunc, ok := game.CharacterRegistry[char]
+		if !ok {
 			return integration.InvalidRequest(c, "bad character selection")
 		}
+		char := createFunc(gp)
+		ptrChars = append(ptrChars, &char)
 	}
+
+	// Save chars
+	lobby.SetPlayerCharsById(req.PlayerId, ptrChars)
 
 	if err := lobby.SetReadyPlayerById(req.PlayerId, true); err != nil {
 		return integration.InvalidRequest(c, "invalid player id")

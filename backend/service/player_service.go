@@ -107,3 +107,33 @@ func (lobby *Lobby) GetPlayerTokenById(playerId string) string {
 	}
 	return player.Token
 }
+
+func (lobby *Lobby) SetGamePlayerById(playerId string) (*game.GamePlayer, error) {
+	lobby.mutex.Lock()
+	defer lobby.mutex.Unlock()
+
+	player, ok := lobby.players[playerId]
+	if !ok {
+		return nil, fmt.Errorf("id doesn't exist")
+	}
+	player.GamePlayer = &game.GamePlayer{
+		ID:         playerId,
+		Mana:       0,
+		Characters: []*game.Character{},
+	}
+	lobby.players[playerId] = player
+	return player.GamePlayer, nil
+}
+
+func (lobby *Lobby) SetPlayerCharsById(playerId string, chars []*game.Character) error {
+	lobby.mutex.Lock()
+	defer lobby.mutex.Unlock()
+
+	player, ok := lobby.players[playerId]
+	if !ok {
+		return fmt.Errorf("id doesn't exist")
+	}
+	player.GamePlayer.Characters = chars
+	lobby.players[playerId] = player
+	return nil
+}
