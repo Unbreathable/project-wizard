@@ -23,10 +23,12 @@ type SimulationResult struct {
 }
 
 // Event for game start
-func GameStartEvent() neogate.Event {
+func GameStartEvent(data map[string][]game.Character) neogate.Event {
 	return neogate.Event{
 		Name: "game_start",
-		Data: fiber.Map{}, // TODO: return used characters
+		Data: fiber.Map{
+			"characters": data,
+		},
 	}
 }
 

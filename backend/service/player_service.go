@@ -8,11 +8,11 @@ import (
 )
 
 type Player struct {
-	ID         string `json:"player_id"` // Player id
-	Name       string `json:"name"`
-	Ready      bool   `json:"ready"`
-	Token      string // Player verification
-	GamePlayer *game.GamePlayer
+	ID         string           `json:"player_id"` // Player id
+	Name       string           `json:"name"`
+	Ready      bool             `json:"ready"`
+	Token      string           `json:"-"` // Player verification
+	GamePlayer *game.GamePlayer `json:"-"`
 }
 
 // int playerPos refers to the players position (player1 or player2)

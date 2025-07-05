@@ -136,7 +136,21 @@ func (lobby *Lobby) StartGame() {
 			lobby.playersId[1]: {},
 		},
 	}
+	player1, _ := lobby.players[lobby.playersId[0]]
+	player2, _ := lobby.players[lobby.playersId[1]]
+	charsP1 := []game.Character{}
+	charsP2 := []game.Character{}
+
+	for _, v := range player1.GamePlayer.Characters {
+		charsP1 = append(charsP1, *v)
+	}
+	for _, v := range player2.GamePlayer.Characters {
+		charsP2 = append(charsP2, *v)
+	}
 
 	// Send game start event
-	Instance.Send([]string{lobby.GetPlayerTokenById(lobby.playersId[0]), lobby.GetPlayerTokenById(lobby.playersId[1])}, GameStartEvent())
+	Instance.Send([]string{player1.Token, player2.Token}, GameStartEvent(map[string][]game.Character{
+		lobby.playersId[0]: charsP1,
+		lobby.playersId[1]: charsP2,
+	}))
 }
