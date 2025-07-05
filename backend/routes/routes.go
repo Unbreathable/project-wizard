@@ -55,8 +55,8 @@ func setupNeo(router fiber.Router) {
 			var clientInfo neogate.ClientInfo
 
 			clientInfo = neogate.ClientInfo{
-				Account: "acc-1",
-				Session: "acc-1",
+				Account: token,
+				Session: attachments,
 			}
 			return clientInfo, true
 		},

@@ -2,7 +2,6 @@ package game
 
 import (
 	"errors"
-	"fmt"
 )
 
 type GameAction struct {
@@ -15,8 +14,7 @@ type GameAction struct {
 func RunSimulation(players []*GamePlayer, actions map[string][]GameAction) error {
 
 	// Convert all the actions made by the player to actual actions from characters
-	actionsToExecute := map[string][]Action{}
-	actionTargets := map[string]*Character{} // Format for key: player_id:character_id:action_id
+	actionsToExecute := map[string][]*Action{}
 	for _, player := range players {
 		for _, action := range actions[player.ID] {
 			var character *Character = nil
@@ -36,9 +34,9 @@ func RunSimulation(players []*GamePlayer, actions map[string][]GameAction) error
 			}
 
 			if actionsToExecute[player.ID] == nil {
-				actionsToExecute[player.ID] = []Action{}
+				actionsToExecute[player.ID] = []*Action{}
 			}
-			actionsToExecute[player.ID] = append(actionsToExecute[player.ID], *actionToExecute)
+			actionToExecute.originCharacter = character
 
 			// Find target for the action
 			var targettedCharacter *Character = nil
@@ -50,13 +48,31 @@ func RunSimulation(players []*GamePlayer, actions map[string][]GameAction) error
 			if targettedCharacter == nil {
 				return errors.New("couldn't find target for action")
 			}
-			actionTargets[actionTarget(player.ID, action.CharacterId, action.ActionId)] = targettedCharacter
+			actionToExecute.targetCharacter = targettedCharacter
+
+			actionsToExecute[player.ID] = append(actionsToExecute[player.ID], actionToExecute)
 		}
 	}
 
-	return nil
-}
+	// Prepare all the actions
+	for _, actions := range actionsToExecute {
+		for _, a := range actions {
+			if a.Before != nil {
+				a.Before(a.originCharacter, a.targetCharacter)
+			}
+		}
+	}
 
-func actionTarget(player string, character uint, action uint) string {
-	return fmt.Sprintf("%s:%d:%d", player, character, action)
+	// Run all the actions
+	for _, actions := range actionsToExecute {
+		for _, a := range actions {
+			if a.Execute != nil {
+				a.latestResult = a.Execute(a.originCharacter, a.targetCharacter)
+			}
+		}
+	}
+
+	// TODO: Simulate status effects and results of attacks
+
+	return nil
 }

@@ -9,6 +9,11 @@ type Action struct {
 	ManaCost    int      // The mana it costs to cast
 	Oversight   bool     // If the action is allowed to be executed from characters other than the one attached to
 
+	// For easier time coding simulation
+	originCharacter *Character
+	targetCharacter *Character
+	latestResult    ActionResult
+
 	Before  func(current *Character, target *Character)              // Gets called before the simulation runs
 	Execute func(current *Character, target *Character) ActionResult // Gets called to actually execute the action
 }
