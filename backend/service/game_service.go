@@ -2,24 +2,19 @@ package service
 
 import (
 	"sync"
+
+	"github.com/Liphium/project-wizard/backend/game"
 )
 
 const OversightsPerTurn = 1
 const NormalActionsPerTurn = 1
-
-type GameAction struct {
-	CharacterId uint   `json:"char_id" validate:"required"`
-	ActionId    uint   `json:"action_id" validate:"required"`
-	Target      string `json:"target" validate:"required"` // Targetted player
-	Slot        uint   `json:"slot" validate:"required"`   // Targetted slot id
-}
 
 type Game struct {
 	mutex        sync.Mutex
 	relatedLobby *Lobby
 
 	playersReady  map[string]bool
-	playerActions map[string][]GameAction
+	playerActions map[string][]game.GameAction
 	playerSwaps   map[string][]int
 }
 

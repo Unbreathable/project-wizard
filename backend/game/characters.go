@@ -1,5 +1,10 @@
 package game
 
+// All characters (ID -> Creation Function)
+var CharacterRegistry = map[uint]func(uint, *GamePlayer) Character{
+	0: NewChisato,
+}
+
 type Character struct {
 	relatedPlayer *GamePlayer
 	ID            uint // Character id (unique for every character)
@@ -37,4 +42,13 @@ func (c *Character) DealDamage(damage int, element *Element) {
 	}
 
 	c.Health -= finalDamage
+}
+
+// Add status effect to character
+func (c *Character) AddStatusEffect(effect StatusEffect) {
+	if c.StatusEffects == nil {
+		c.StatusEffects = []StatusEffect{}
+	}
+
+	c.StatusEffects = append(c.StatusEffects, effect)
 }
