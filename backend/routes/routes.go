@@ -60,11 +60,20 @@ func setupNeo(router fiber.Router) {
 		},
 
 		// Handle client entering network
-		ClientEnterNetworkHandler: func(client *neogate.Client, key string) bool {
+		ClientEnterNetworkHandler: func(client *neogate.Client, attachment string) bool {
 			// Send an event to notify of connection success
 			service.Instance.SendEventToClient(client, neogate.Event{
 				Name: "ng_success",
 			})
+			att, err := decodeSession(attachment)
+			if err != nil {
+				return true
+			}
+			data, err := lobby_routes.GetLobbyInfo(att.LobbyId)
+			if err != nil {
+				return true
+			}
+			service.Instance.SendOne(client.ID, lobby_routes.LobbyChangeEvent(data))
 
 			return false
 		},

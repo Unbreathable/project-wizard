@@ -36,7 +36,7 @@ func LobbyChangeEvent(data LobbyInfoEventData) neogate.Event {
 }
 
 // Get lobby info
-func getLobbyInfo(lobbyId string) (LobbyInfoEventData, error) {
+func GetLobbyInfo(lobbyId string) (LobbyInfoEventData, error) {
 	lobby, ok := service.GetLobby(lobbyId)
 	if !ok {
 		return LobbyInfoEventData{}, fmt.Errorf("invalid lobby id")

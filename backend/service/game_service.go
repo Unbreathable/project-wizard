@@ -79,8 +79,18 @@ func (g *Game) VerifyPlayerActions(playerId string, actions []game.GameAction, s
 	}
 
 	// TODO: verify actions
-
-	// Set player status ready
+	neededMana := 0
+	for _, action := range actions {
+		character := player.GamePlayer.GetCharacterById(action.CharacterId)
+		if len(character.Actions) < int(action.ActionId)+1 || character.IsDead() {
+			return false
+		}
+		attack := character.Actions[action.ActionId]
+		neededMana += attack.ManaCost
+	}
+	if neededMana > player.GamePlayer.Mana {
+		return false
+	}
 
 	return true
 

@@ -41,7 +41,7 @@ func unreadyLobby(c *fiber.Ctx) error {
 	}
 
 	// Send lobby join event to players
-	data, err := getLobbyInfo(req.LobbyId)
+	data, err := GetLobbyInfo(req.LobbyId)
 	if err != nil {
 		return integration.InvalidRequest(c, err.Error())
 	}
