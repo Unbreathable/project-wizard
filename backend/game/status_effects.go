@@ -38,7 +38,7 @@ func StatusEffectStun(turns int) StatusEffect {
 	}
 }
 
-// Create a stun status effect (player isnt able to atack)
+// Create a status effect that makes that negates all damage
 func StatusEffectInvulnerable(turns int) StatusEffect {
 	return StatusEffect{
 		ID:             "invulnerable",
@@ -109,6 +109,32 @@ func StatusEffectTurnDmgHeal(damageRed int) StatusEffect {
 				result.HealToCharacter = util.Ptr(damageRed)
 				return &result
 			}
+		},
+	}
+}
+
+// Create a status effect that makes that negates all damage from a certain element
+func StatusEffectInvulnerableToElem(element Element) StatusEffect {
+	return StatusEffect{
+		Visible:        false,
+		TurnsRemaining: 0,
+		OnHit: func(current, from *Character, action *Action, result ActionResult) *ActionResult {
+			if result.DamageElement == element {
+				result.DamageToCharacter = util.Ptr(0)
+				return &result
+			}
+			return nil
+		},
+	}
+}
+
+// Create a status effect that turns damage to mana
+func StatusEffectDmgToMana() StatusEffect {
+	return StatusEffect{
+		TurnsRemaining: 0,
+		OnHit: func(current, from *Character, action *Action, result ActionResult) *ActionResult {
+			current.relatedPlayer.Mana += *result.DamageToCharacter
+			return nil
 		},
 	}
 }
