@@ -16,10 +16,12 @@ func RunLobbyInfo(p *mconfig.Plan, lobbyID string) lobby_routes.LobbyInfoRespons
 	if !res.Success {
 		log.Fatalln("request error")
 	}
-	log.Printf("Player 1 name: %s", res.Player1)
-	log.Printf("Player 1 ready: %t", res.Player1Ready)
-	log.Printf("Player 2 name: %s", res.Player2)
-	log.Printf("Player 2 name: %t", res.Player2Ready)
+	log.Printf("Player 1 name: %s", res.Player1.Name)
+	log.Printf("Player 1 ID: %s", res.Player1.ID)
+	log.Printf("Player 1 ready: %t", res.Player1.Ready)
+	log.Printf("Player 2 name: %s", res.Player2.Name)
+	log.Printf("Player 2 ID: %s", res.Player2.ID)
+	log.Printf("Player 2 name: %t", res.Player2.Ready)
 	log.Printf("Char amont: %d", res.CharacterAmount)
 	log.Printf("Running: %t", res.Running)
 	return res

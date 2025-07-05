@@ -16,6 +16,7 @@ type LobbyJoinRequest struct {
 type LobbyJoinResponse struct {
 	Success  bool   `json:"success"`
 	PlayerId string `json:"player_id"`
+	Token    string `json:"token"`
 }
 
 // Route: /lobby/join
@@ -52,5 +53,6 @@ func joinLobby(c *fiber.Ctx) error {
 	return c.JSON(LobbyJoinResponse{
 		Success:  true,
 		PlayerId: p2.ID,
+		Token:    p2.Token,
 	})
 }

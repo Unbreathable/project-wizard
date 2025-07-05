@@ -9,6 +9,7 @@ import (
 type LobbyUnreadyRequest struct {
 	LobbyId  string `json:"lobby_id" validate:"required"`
 	PlayerId string `json:"player_id" validate:"required"`
+	Token    string `json:"token" validate:"required"`
 }
 
 // Route: /lobby/unready
@@ -24,6 +25,11 @@ func unreadyLobby(c *fiber.Ctx) error {
 	lobby, ok := service.GetLobby(req.LobbyId)
 	if !ok {
 		return integration.InvalidRequest(c, "invalid lobby id")
+	}
+
+	// verify player token
+	if lobby.GetPlayerTokenById(req.PlayerId) != req.Token {
+		return integration.InvalidRequest(c, "bad token")
 	}
 
 	if err := lobby.SetReadyPlayerById(req.PlayerId, false); err != nil {

@@ -9,6 +9,7 @@ import (
 type LobbyReadyRequest struct {
 	LobbyId    string `json:"lobby_id" validate:"required"`
 	PlayerId   string `json:"player_id" validate:"required"`
+	Token      string `json:"token" validate:"required"`
 	Characters []uint `json:"character_ids" validate:"required"`
 }
 
@@ -29,6 +30,11 @@ func readyLobby(c *fiber.Ctx) error {
 
 	if len(req.Characters) != service.CharacterAmount {
 		return integration.InvalidRequest(c, "invalid character amount")
+	}
+
+	// verify player token
+	if lobby.GetPlayerTokenById(req.PlayerId) != req.Token {
+		return integration.InvalidRequest(c, "bad token")
 	}
 
 	// TODO: login characters and check validity

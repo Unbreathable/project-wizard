@@ -16,6 +16,7 @@ func MagicTestLobby(t *testing.T, p *mconfig.Plan) {
 	lobby2Username1 := "lobby2"
 
 	lobbyId1 := ""
+	playerId1 := ""
 	playerId2 := ""
 
 	// Create 2 lobbies
@@ -24,7 +25,7 @@ func MagicTestLobby(t *testing.T, p *mconfig.Plan) {
 		magic_util.AssertEq(t, requests.ValueOr(res, "success", false), true)
 
 		lobbyId1 = requests.ValueOr(res, "lobby_id", "no id")
-		requests.ValueOr(res, "player_id", "no id")
+		playerId1 = requests.ValueOr(res, "player_id", "no id")
 
 		res = magic_scripts.RunLobbyCreate(p, lobby2Username1)
 		magic_util.AssertEq(t, requests.ValueOr(res, "success", false), true)
@@ -43,10 +44,12 @@ func MagicTestLobby(t *testing.T, p *mconfig.Plan) {
 		infoRes := magic_scripts.RunLobbyInfo(p, lobbyId1)
 
 		magic_util.AssertEq(t, infoRes.Success, true)
-		magic_util.AssertEq(t, infoRes.Player1, lobby1Username1)
-		magic_util.AssertEq(t, infoRes.Player2, lobby1Username2)
-		magic_util.AssertEq(t, infoRes.Player1Ready, false)
-		magic_util.AssertEq(t, infoRes.Player2Ready, false)
+		magic_util.AssertEq(t, infoRes.Player1.Name, lobby1Username1)
+		magic_util.AssertEq(t, infoRes.Player2.Name, lobby1Username2)
+		magic_util.AssertEq(t, infoRes.Player1.ID, playerId1)
+		magic_util.AssertEq(t, infoRes.Player2.ID, playerId2)
+		magic_util.AssertEq(t, infoRes.Player1.Ready, false)
+		magic_util.AssertEq(t, infoRes.Player2.Ready, false)
 	})
 
 	// Ready player 2
@@ -59,10 +62,12 @@ func MagicTestLobby(t *testing.T, p *mconfig.Plan) {
 		infoRes := magic_scripts.RunLobbyInfo(p, lobbyId1)
 
 		magic_util.AssertEq(t, infoRes.Success, true)
-		magic_util.AssertEq(t, infoRes.Player1, lobby1Username1)
-		magic_util.AssertEq(t, infoRes.Player2, lobby1Username2)
-		magic_util.AssertEq(t, infoRes.Player1Ready, false)
-		magic_util.AssertEq(t, infoRes.Player2Ready, true)
+		magic_util.AssertEq(t, infoRes.Player1.Name, lobby1Username1)
+		magic_util.AssertEq(t, infoRes.Player2.Name, lobby1Username2)
+		magic_util.AssertEq(t, infoRes.Player1.ID, playerId1)
+		magic_util.AssertEq(t, infoRes.Player2.ID, playerId2)
+		magic_util.AssertEq(t, infoRes.Player1.Ready, false)
+		magic_util.AssertEq(t, infoRes.Player2.Ready, true)
 	})
 
 	// Unready player 2
@@ -75,10 +80,12 @@ func MagicTestLobby(t *testing.T, p *mconfig.Plan) {
 		infoRes := magic_scripts.RunLobbyInfo(p, lobbyId1)
 
 		magic_util.AssertEq(t, infoRes.Success, true)
-		magic_util.AssertEq(t, infoRes.Player1, lobby1Username1)
-		magic_util.AssertEq(t, infoRes.Player2, lobby1Username2)
-		magic_util.AssertEq(t, infoRes.Player1Ready, false)
-		magic_util.AssertEq(t, infoRes.Player2Ready, false)
+		magic_util.AssertEq(t, infoRes.Player1.Name, lobby1Username1)
+		magic_util.AssertEq(t, infoRes.Player2.Name, lobby1Username2)
+		magic_util.AssertEq(t, infoRes.Player1.ID, playerId1)
+		magic_util.AssertEq(t, infoRes.Player2.ID, playerId2)
+		magic_util.AssertEq(t, infoRes.Player1.Ready, false)
+		magic_util.AssertEq(t, infoRes.Player2.Ready, false)
 	})
 
 }

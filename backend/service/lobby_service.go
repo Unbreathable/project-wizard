@@ -41,15 +41,17 @@ func CreateLobby(name string) (lobbyId string, playerID string) {
 	}
 
 	playerMap := map[string]Player{
-		playerID: Player{
+		playerID: {
 			Name:  name,
 			ID:    playerID,
 			Ready: false,
+			Token: uuid.New().String(),
 		},
-		player2ID: Player{
+		player2ID: {
 			Name:  "",
 			ID:    player2ID,
 			Ready: false,
+			Token: uuid.New().String(),
 		},
 	}
 

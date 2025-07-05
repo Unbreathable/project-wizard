@@ -8,9 +8,10 @@ import (
 )
 
 type Player struct {
-	ID         string `json:"player_id"`
+	ID         string `json:"player_id"` // Player id
 	Name       string `json:"name"`
 	Ready      bool   `json:"ready"`
+	Token      string // Player verification
 	GamePlayer *game.GamePlayer
 }
 
@@ -94,4 +95,15 @@ func (lobby *Lobby) SetReadyPlayerById(playerId string, ready bool) error {
 	player.Ready = ready
 	lobby.players[playerId] = player
 	return nil
+}
+
+func (lobby *Lobby) GetPlayerTokenById(playerId string) string {
+	lobby.mutex.Lock()
+	defer lobby.mutex.Unlock()
+
+	player, ok := lobby.players[playerId]
+	if !ok {
+		return ""
+	}
+	return player.Token
 }

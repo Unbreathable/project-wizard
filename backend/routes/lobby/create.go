@@ -16,6 +16,7 @@ type LobbyCreateResponse struct {
 	Success  bool   `json:"success"`
 	LobbyId  string `json:"lobby_id"`
 	PlayerId string `json:"player_id"`
+	Token    string `json:"token"`
 }
 
 // Route: /lobby/create
@@ -33,10 +34,13 @@ func createLobby(c *fiber.Ctx) error {
 	}
 
 	lobbyId, playerId := service.CreateLobby(req.Name)
+	lobby, _ := service.GetLobby(lobbyId)
+	token := lobby.GetPlayerTokenById(playerId)
 
 	return c.JSON(LobbyCreateResponse{
 		Success:  true,
 		LobbyId:  lobbyId,
 		PlayerId: playerId,
+		Token:    token,
 	})
 }
