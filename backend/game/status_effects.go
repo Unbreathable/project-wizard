@@ -6,5 +6,5 @@ type StatusEffect struct {
 	Description string // Only needed when visible
 	Visible     bool
 
-	OnHit func(current *Character, action *Action) // Apply the status effect when the character gets hit
+	OnHit func(current *Character, from *Character, action *Action) // Apply the status effect when the character gets hit
 }

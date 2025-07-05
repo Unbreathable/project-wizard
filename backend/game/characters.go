@@ -2,6 +2,7 @@ package game
 
 type Character struct {
 	relatedPlayer *GamePlayer
+	ID            uint // Character id (unique for every character)
 	Name          string
 	Origin        string // Which anime, game or whereever they came from
 	Elements      []Element
