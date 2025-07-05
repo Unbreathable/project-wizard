@@ -8,7 +8,13 @@
 		setOpponent,
 		useEvent
 	} from '$lib/connection.svelte';
-	import { characters, Element, initializeCharacters, type Character } from '$lib/characters';
+	import {
+		characters,
+		Element,
+		getElementColor,
+		initializeCharacters,
+		type Character
+	} from '$lib/characters';
 	import { onMount } from 'svelte';
 	import { postRequestURL } from '$lib/requests';
 
@@ -158,25 +164,6 @@
 
 	function handleMouseLeave() {
 		hoveredCharacter = null;
-	}
-
-	function getElementColor(element: string): string {
-		switch (element) {
-			case 'fire':
-				return '#c42430';
-			case 'water':
-				return '#0069aa';
-			case 'earth':
-				return '#1e6f50';
-			case 'air':
-				return '#5d5d5d';
-			case 'dark':
-				return '#622461';
-			case 'light':
-				return '#ed7614';
-			default:
-				return '#95a5a6';
-		}
 	}
 </script>
 

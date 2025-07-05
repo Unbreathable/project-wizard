@@ -10,6 +10,25 @@ export enum Element {
     None = "none",
 }
 
+	export function getElementColor(element: string): string {
+		switch (element) {
+			case 'fire':
+				return '#c42430';
+			case 'water':
+				return '#0069aa';
+			case 'earth':
+				return '#1e6f50';
+			case 'air':
+				return '#5d5d5d';
+			case 'dark':
+				return '#622461';
+			case 'light':
+				return '#ed7614';
+			default:
+				return '#95a5a6';
+		}
+	}
+
 export interface Action {
     name: string;
     description: string;
@@ -22,6 +41,7 @@ export interface Action {
 export interface Character {
     id: number;
     url: string;
+    health?: number;
     name?: string;
     origin?: string;
     elements?: Element[];
