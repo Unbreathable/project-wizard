@@ -3,6 +3,7 @@ package service
 import (
 	"sync"
 
+	"github.com/Liphium/project-wizard/backend/game"
 	"github.com/google/uuid"
 )
 
@@ -98,4 +99,28 @@ func (lobby *Lobby) IsRunning() bool {
 	lobby.mutex.Lock()
 	defer lobby.mutex.Unlock()
 	return lobby.game != nil
+}
+
+func (lobby *Lobby) StartGame() {
+	lobby.mutex.Lock()
+	defer lobby.mutex.Unlock()
+
+	lobby.game = &Game{
+		mutex:        sync.Mutex{},
+		relatedLobby: lobby,
+		playersReady: map[string]bool{
+			lobby.playersId[0]: false,
+			lobby.playersId[1]: false,
+		},
+		playerActions: map[string][]game.GameAction{
+			lobby.playersId[0]: {},
+			lobby.playersId[1]: {},
+		},
+		playerSwaps: map[string][]int{
+			lobby.playersId[0]: {},
+			lobby.playersId[1]: {},
+		},
+	}
+
+	// TODO: send game start event
 }

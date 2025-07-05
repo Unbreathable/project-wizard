@@ -38,6 +38,9 @@ func turnGame(c *fiber.Ctx) error {
 	}
 
 	game := lobby.GetGame()
+	if game == nil {
+		return integration.InvalidRequest(c, "no game")
+	}
 
 	if game.IsReady() {
 		return integration.InvalidRequest(c, "turn is running")
