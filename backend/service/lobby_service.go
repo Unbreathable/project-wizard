@@ -11,7 +11,7 @@ import (
 const CharacterAmount = 4
 
 type Lobby struct {
-	mutex     sync.Mutex
+	mutex     *sync.Mutex
 	id        string            // uuid strings
 	playersId []string          // uuid strings
 	players   map[string]Player // uuid strings
@@ -59,7 +59,7 @@ func CreateLobby(name string) (lobbyId string, playerID string) {
 
 	// Store lobby
 	lobbies.Store(lobbyId, &Lobby{
-		mutex:     sync.Mutex{},
+		mutex:     &sync.Mutex{},
 		id:        lobbyId,
 		playersId: []string{playerID, player2ID},
 		players:   playerMap,
@@ -121,7 +121,7 @@ func (lobby *Lobby) StartGame() {
 	defer lobby.mutex.Unlock()
 
 	lobby.game = &Game{
-		mutex:        sync.Mutex{},
+		mutex:        &sync.Mutex{},
 		relatedLobby: lobby,
 		playersReady: map[string]bool{
 			lobby.playersId[0]: false,

@@ -10,7 +10,7 @@ const OversightsPerTurn = 1
 const NormalActionsPerTurn = 1
 
 type Game struct {
-	mutex        sync.Mutex
+	mutex        *sync.Mutex
 	relatedLobby *Lobby
 
 	playersReady  map[string]bool

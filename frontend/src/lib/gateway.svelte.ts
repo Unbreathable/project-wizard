@@ -32,6 +32,7 @@ export class Gateway {
                 try {
                     let blob = event.data as Blob;
                     const parsedEvent = JSON.parse(await blob.text());
+                    console.log("event", parsedEvent)
                     gateway.notifyHandlers(parsedEvent);
                 } catch(e) {
                     console.error("gate read failed", e)

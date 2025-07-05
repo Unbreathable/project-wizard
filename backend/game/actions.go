@@ -10,12 +10,12 @@ type Action struct {
 	Oversight   bool    `json:"oversight"` // If the action is allowed to be executed from characters other than the one attached to
 
 	// For easier time coding simulation
-	originCharacter *Character
-	targetCharacter *Character
-	latestResult    ActionResult
+	originCharacter *Character   `json:"-"`
+	targetCharacter *Character   `json:"-"`
+	latestResult    ActionResult `json:"-"`
 
-	Before  func(current *Character, target *Character)              // Gets called before the simulation runs
-	Execute func(current *Character, target *Character) ActionResult // Gets called to actually execute the action
+	Before  func(current *Character, target *Character)              `json:"-"` // Gets called before the simulation runs
+	Execute func(current *Character, target *Character) ActionResult `json:"-"` // Gets called to actually execute the action
 }
 
 // Create a new action that deals damage on execution.

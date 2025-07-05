@@ -1,3 +1,5 @@
+import { postRequestURL } from "./requests";
+
 export enum Element {
     Fire = "fire",
     Water = "water",
@@ -56,3 +58,30 @@ export let characters: Record<number, Character> = {
         url: "index.png" 
     },
 };
+
+export async function initializeCharacters() {
+    try {
+        const response = await postRequestURL("/info/characters", {});
+        
+        if (response.success && response.characters) {
+            // Update the characters record with data from the backend
+            for (const character of response.characters) {
+                const existingCharacter = characters[character.id];
+                if (existingCharacter) {
+                    // Merge backend data with existing character data (keeping the URL)
+                    characters[character.id] = {
+                        ...existingCharacter,
+                        name: character.name,
+                        origin: character.origin,
+                        elements: character.elements,
+                        actions: character.actions
+                    };
+                }
+            }
+        } else {
+            console.error("Failed to fetch characters:", response.message || "Unknown error");
+        }
+    } catch (error) {
+        console.error("Error initializing characters:", error);
+    }
+}

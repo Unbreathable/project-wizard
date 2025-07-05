@@ -1,10 +1,15 @@
 import type { Event } from "./gateway.svelte";
 import { Gateway } from "./gateway.svelte";
-import { getServerUrl } from "./index";
 import { postRequestURL } from "./requests";
 
 export let currentLobby: string | undefined = undefined;
 export let currentPlayer: string | undefined = undefined;
+export let currentToken: string | undefined = undefined;
+export let currentOpponent: any | undefined = undefined;
+
+export function setOpponent(op: any) {
+    currentOpponent = op
+}
 
 let currentGate: Gateway | null = null;
 
@@ -16,7 +21,7 @@ let currentGate: Gateway | null = null;
 export async function joinSession(lobbyId: string, name: string): Promise<string | undefined> {
     try {
         // Make API request to join lobby
-        const response = await postRequestURL(`${getServerUrl()}/lobby/join`, {
+        const response = await postRequestURL(`/lobby/join`, {
             "lobby_id": lobbyId,
             "name": name
         });
@@ -32,6 +37,7 @@ export async function joinSession(lobbyId: string, name: string): Promise<string
         }));
         currentLobby = lobbyId;
         currentPlayer = response.player_id;
+        currentToken = response.token;
         
         return undefined;
     } catch (error) {
@@ -45,7 +51,7 @@ export async function joinSession(lobbyId: string, name: string): Promise<string
 export async function createSession(name: string): Promise<string | undefined> {
     try {
         // Make API request to create lobby
-        const response = await postRequestURL(`${getServerUrl()}/lobby/create`, {
+        const response = await postRequestURL(`/lobby/create`, {
             "name": name
         });
 
@@ -60,6 +66,7 @@ export async function createSession(name: string): Promise<string | undefined> {
         }));
         currentLobby = response.lobby_id;
         currentPlayer = response.player_id;
+        currentToken = response.token;
         
         return undefined;
     } catch (error) {

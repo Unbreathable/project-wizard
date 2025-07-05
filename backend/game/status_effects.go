@@ -9,7 +9,7 @@ type StatusEffect struct {
 	Visible        bool   `json:"visible"`
 	TurnsRemaining int    `json:"turns_remaining"` // How many turns the effect will still stay
 
-	OnHit func(current *Character, from *Character, action *Action, result ActionResult) *ActionResult // Apply the status effect when the character gets hit
+	OnHit func(current *Character, from *Character, action *Action, result ActionResult) *ActionResult `json:"-"` // Apply the status effect when the character gets hit
 }
 
 // Create a dodge status effect (ignores attacks on current user, invisible)
