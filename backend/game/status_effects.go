@@ -27,3 +27,35 @@ func StatusEffectDodge(turns int) StatusEffect {
 		},
 	}
 }
+
+// Create a stun status effect (player isnt able to atack)
+func StatusEffectStun(turns int) StatusEffect {
+	return StatusEffect{
+		Visible:        true,
+		TurnsRemaining: turns,
+		OnHit: func(current, from *Character, action *Action, result ActionResult) *ActionResult {
+			if action.Damage > 0 && !action.Oversight {
+				return &ActionResult{
+					DamageToCharacter: util.Ptr(0),
+				}
+			}
+			return nil
+		},
+	}
+}
+
+// Create a status effect that applies damage to the character a a redused rate
+func StatusEffectTakeDamage(parcentage float64) StatusEffect {
+	return StatusEffect{
+		Visible:        false,
+		TurnsRemaining: 1,
+		OnHit: func(current, from *Character, action *Action, result ActionResult) *ActionResult {
+			if action.Damage > 0 && !action.Oversight {
+				return &ActionResult{
+					DamageToCharacter: util.Ptr(0),
+				}
+			}
+			return nil
+		},
+	}
+}
