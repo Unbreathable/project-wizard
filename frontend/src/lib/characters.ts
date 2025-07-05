@@ -14,9 +14,9 @@ export interface Action {
     name: string;
     description: string;
     element: Element;
-    Damage: number;
-    ManaCost: number;
-    Oversight: boolean;
+    damage: number;
+    mana_cost: number;
+    oversight: boolean;
 }
 
 export interface Character {
@@ -25,7 +25,7 @@ export interface Character {
     name?: string;
     origin?: string;
     elements?: Element[];
-    actions?: Action[];
+    actions?: Record<number, Action>;
 }
 
 export let characters: Record<number, Character> = {

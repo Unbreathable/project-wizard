@@ -31,16 +31,11 @@ func StatusEffectDodge(turns int) StatusEffect {
 // Create a stun status effect (player isnt able to atack)
 func StatusEffectStun(turns int) StatusEffect {
 	return StatusEffect{
+		ID:             "stun",
+		Name:           "Stun",
+		Description:    "The character can't perform actions.",
 		Visible:        true,
 		TurnsRemaining: turns,
-		OnHit: func(current, from *Character, action *Action, result ActionResult) *ActionResult {
-			if action.Damage > 0 && !action.Oversight {
-				return &ActionResult{
-					DamageToCharacter: util.Ptr(0),
-				}
-			}
-			return nil
-		},
 	}
 }
 

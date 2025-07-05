@@ -301,7 +301,7 @@
 
 			<div class="space-y-2">
 				<h4 class="font-pixel text-bg-100 text-sm">Actions:</h4>
-				{#each hoveredCharacter.actions as action}
+				{#each Object.values(hoveredCharacter.actions) as action}
 					<div class="bg-bg-700 border border-bg-400 rounded p-2">
 						<div class="flex justify-between items-start mb-1">
 							<span class="font-pixel text-bg-100 text-sm">{action.name}</span>
@@ -316,13 +316,13 @@
 						</div>
 						<p class="font-pixel text-bg-200 text-xs">{action.description}</p>
 						<div class="flex gap-3 text-xs font-pixel">
-							{#if action.Damage}
-								<span class="text-red-400 mt-2">DMG: {action.Damage}</span>
+							{#if action.damage}
+								<span class="text-red-400 mt-2">DMG: {action.damage}</span>
 							{/if}
-							{#if action.ManaCost}
-								<span class="text-blue-400 mt-2">MANA: {action.ManaCost}</span>
+							{#if action.mana_cost}
+								<span class="text-blue-400 mt-2">MANA: {action.mana_cost}</span>
 							{/if}
-							{#if action.Oversight}
+							{#if action.oversight}
 								<span class="text-yellow-400 mt-2">OVERSIGHT</span>
 							{/if}
 						</div>

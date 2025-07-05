@@ -16,7 +16,7 @@ func NewChisato(id uint, player *GamePlayer) Character {
 				Description: "Dodge any attack cast on her.",
 				ManaCost:    40,
 				Before: func(current, target *Character) {
-					current.AddStatusEffect(StatusEffectDodge(1))
+					current.AddStatusEffect(StatusEffectDodge(0))
 				},
 			},
 			2: {
