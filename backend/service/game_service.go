@@ -78,17 +78,36 @@ func (g *Game) VerifyPlayerActions(playerId string, actions []game.GameAction, s
 		return false
 	}
 
-	// TODO: verify actions
 	neededMana := 0
+	oversights := 0
+	normal := 0
 	for _, action := range actions {
 		character := player.GamePlayer.GetCharacterById(action.CharacterId)
 		if len(character.Actions) < int(action.ActionId)+1 || character.IsDead() {
 			return false
 		}
 		attack := character.Actions[action.ActionId]
+		if attack.Oversight {
+			oversights++
+
+		} else {
+			normal++
+		}
 		neededMana += attack.ManaCost
+
+		// Check if the selected slots are correct
+		targetPlayer, _, err := g.relatedLobby.GetPlayerById(action.Target)
+		if err != nil {
+			return false
+		}
+		targetChars := targetPlayer.GamePlayer.Characters
+		if len(targetChars) < action.Slot+1 || targetChars[action.Slot].IsDead() {
+			return false
+		}
 	}
-	if neededMana > player.GamePlayer.Mana {
+
+	// Check mana and action type
+	if neededMana > player.GamePlayer.Mana || oversights > OversightsPerTurn || normal > NormalActionsPerTurn {
 		return false
 	}
 

@@ -8,7 +8,7 @@ type GameAction struct {
 	CharacterId uint   `json:"char_id" validate:"required"`
 	ActionId    uint   `json:"action_id" validate:"required"`
 	Target      string `json:"target" validate:"required"` // Targetted player
-	Slot        uint   `json:"slot" validate:"required"`   // Targetted slot id
+	Slot        int    `json:"slot" validate:"required"`   // Targetted slot id
 }
 
 func RunSimulation(players []*GamePlayer, actions map[string][]GameAction) error {
