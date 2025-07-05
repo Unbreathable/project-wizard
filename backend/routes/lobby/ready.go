@@ -7,9 +7,9 @@ import (
 )
 
 type LobbyReadyRequest struct {
-	LobbyId    string   `json:"lobby_id" validate:"required"`
-	PlayerId   string   `json:"player_id" validate:"required"`
-	Characters []string `json:"character_ids" validate:"required"`
+	LobbyId    string `json:"lobby_id" validate:"required"`
+	PlayerId   string `json:"player_id" validate:"required"`
+	Characters []uint `json:"character_ids" validate:"required"`
 }
 
 // Route: /lobby/ready

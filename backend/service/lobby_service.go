@@ -3,7 +3,6 @@ package service
 import (
 	"sync"
 
-	"github.com/Liphium/project-wizard/backend/game"
 	"github.com/google/uuid"
 )
 
@@ -14,7 +13,7 @@ type Lobby struct {
 	id        string            // uuid strings
 	playersId []string          // uuid strings
 	players   map[string]Player // uuid strings
-	game      *game.Game
+	game      *Game
 }
 
 var lobbies sync.Map
