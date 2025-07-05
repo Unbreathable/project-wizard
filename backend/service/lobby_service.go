@@ -138,6 +138,5 @@ func (lobby *Lobby) StartGame() {
 	}
 
 	// Send game start event
-	Instance.SendOne(lobby.GetPlayerTokenById(lobby.playersId[0]), GameStartEvent())
-	Instance.SendOne(lobby.GetPlayerTokenById(lobby.playersId[1]), GameStartEvent())
+	Instance.Send([]string{lobby.GetPlayerTokenById(lobby.playersId[0]), lobby.GetPlayerTokenById(lobby.playersId[1])}, GameStartEvent())
 }
