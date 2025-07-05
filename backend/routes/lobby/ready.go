@@ -1,6 +1,7 @@
 package lobby_routes
 
 import (
+	"github.com/Liphium/project-wizard/backend/game"
 	"github.com/Liphium/project-wizard/backend/integration"
 	"github.com/Liphium/project-wizard/backend/service"
 	"github.com/gofiber/fiber/v2"
@@ -28,16 +29,23 @@ func readyLobby(c *fiber.Ctx) error {
 		return integration.InvalidRequest(c, "invalid request id")
 	}
 
-	if len(req.Characters) != service.CharacterAmount {
-		return integration.InvalidRequest(c, "invalid character amount")
-	}
-
 	// verify player token
 	if lobby.GetPlayerTokenById(req.PlayerId) != req.Token {
 		return integration.InvalidRequest(c, "bad token")
 	}
 
-	// TODO: login characters and check validity
+	// Check the validity of characters
+	if len(req.Characters) != service.CharacterAmount {
+		return integration.InvalidRequest(c, "invalid character amount")
+	}
+	if hasDuplicates(req.Characters) {
+		return integration.InvalidRequest(c, "bad character selection")
+	}
+	for _, char := range req.Characters {
+		if _, ok := game.CharacterRegistry[char]; !ok {
+			return integration.InvalidRequest(c, "bad character selection")
+		}
+	}
 
 	if err := lobby.SetReadyPlayerById(req.PlayerId, true); err != nil {
 		return integration.InvalidRequest(c, "invalid player id")
@@ -60,4 +68,15 @@ func readyLobby(c *fiber.Ctx) error {
 	}
 
 	return integration.SuccessfulRequest(c)
+}
+
+func hasDuplicates(slice []uint) bool {
+	seen := make(map[uint]bool)
+	for _, value := range slice {
+		if seen[value] {
+			return true // Duplicate found
+		}
+		seen[value] = true
+	}
+	return false // No duplicates
 }
