@@ -1,6 +1,7 @@
 package service
 
 import (
+	"slices"
 	"sync"
 
 	"github.com/Liphium/project-wizard/backend/game"
@@ -86,6 +87,13 @@ func (g *Game) VerifyPlayerActions(playerId string, actions []game.GameAction, s
 		if len(character.Actions) < int(action.ActionId)+1 || character.IsDead() {
 			return false
 		}
+
+		if slices.ContainsFunc(character.StatusEffects, func(effect game.StatusEffect) bool {
+			return effect.ID == "stun"
+		}) {
+			return false
+		}
+
 		attack := character.Actions[action.ActionId]
 		if attack.Oversight {
 			oversights++

@@ -37,7 +37,8 @@ func NewChisato(id uint, player *GamePlayer) Character {
 				ManaCost:    20,
 				Oversight:   true,
 				Before: func(current, target *Character) {
-					current.AddStatusEffect(StatusEffectTakeDamage(0.6))
+					target.AddStatusEffect(StatusEffectInvulnerable(0))
+					current.AddStatusEffect(StatusEffectReducedDamage(0.6))
 				},
 			},
 		},

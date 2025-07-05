@@ -30,6 +30,7 @@ func NewDamageAction(id uint, name string, description string, damage int, eleme
 		Execute: func(current, target *Character) ActionResult {
 			return ActionResult{
 				DamageToCharacter: &damage,
+				DamageElement:     element,
 			}
 		},
 	}
@@ -37,4 +38,5 @@ func NewDamageAction(id uint, name string, description string, damage int, eleme
 
 type ActionResult struct {
 	DamageToCharacter *int
+	DamageElement     Element
 }
