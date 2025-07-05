@@ -40,7 +40,17 @@ func setupNeo(router fiber.Router) {
 		ClientDisconnectHandler: func(client *neogate.Client) {
 			neoAtt, err := decodeSession(client.Session)
 			if err == nil {
-				service.RemoveLobby(neoAtt.LobbyId)
+				lobby, ok := service.GetLobby(neoAtt.LobbyId)
+				if ok {
+					players := lobby.GetPlayers()
+					service.RemoveLobby(neoAtt.LobbyId)
+					for _, p := range players {
+						data, err := encodeSession(NeogateTokenAttachment{PlayerId: p.ID, LobbyId: neoAtt.LobbyId})
+						if err == nil {
+							service.Instance.Disconnect(p.Token, data)
+						}
+					}
+				}
 			}
 		},
 
@@ -106,4 +116,12 @@ func decodeSession(attachments string) (NeogateTokenAttachment, error) {
 	var neoAtt NeogateTokenAttachment
 	err := json.Unmarshal([]byte(attachments), &neoAtt)
 	return neoAtt, err
+}
+
+func encodeSession(att NeogateTokenAttachment) (string, error) {
+	bytes, err := json.Marshal(att)
+	if err != nil {
+		return "", err
+	}
+	return string(bytes), nil
 }

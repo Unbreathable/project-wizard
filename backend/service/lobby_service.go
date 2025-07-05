@@ -1,6 +1,7 @@
 package service
 
 import (
+	"maps"
 	"sync"
 
 	"github.com/Liphium/project-wizard/backend/game"
@@ -87,6 +88,20 @@ func (lobby *Lobby) GetGame() *Game {
 	defer lobby.mutex.Unlock()
 
 	return lobby.game
+}
+
+// Returns all players
+func (lobby *Lobby) GetPlayers() []Player {
+	lobby.mutex.Lock()
+	defer lobby.mutex.Unlock()
+
+	players := []Player{}
+
+	for p := range maps.Values(lobby.players) {
+		players = append(players, p)
+	}
+
+	return players
 }
 
 func (lobby *Lobby) IsFull() bool {
