@@ -38,7 +38,10 @@ func setupNeo(router fiber.Router) {
 
 		// Handle client disconnect
 		ClientDisconnectHandler: func(client *neogate.Client) {
-			// TODO: Maybe handle disconnections a little more?
+			neoAtt, err := decodeSession(client.Session)
+			if err == nil {
+				service.RemoveLobby(neoAtt.LobbyId)
+			}
 		},
 
 		// Handle enter network
@@ -65,8 +68,7 @@ func setupNeo(router fiber.Router) {
 				Session: attachments,
 			}
 
-			var neoAtt NeogateTokenAttachment
-			err := json.Unmarshal([]byte(attachments), &neoAtt)
+			neoAtt, err := decodeSession(attachments)
 			if err != nil {
 				return clientInfo, false
 			}
@@ -98,4 +100,10 @@ func setupNeo(router fiber.Router) {
 	// Add all the routes for the gateway
 	router.Route("/connect", service.Instance.MountGateway)
 
+}
+
+func decodeSession(attachments string) (NeogateTokenAttachment, error) {
+	var neoAtt NeogateTokenAttachment
+	err := json.Unmarshal([]byte(attachments), &neoAtt)
+	return neoAtt, err
 }
