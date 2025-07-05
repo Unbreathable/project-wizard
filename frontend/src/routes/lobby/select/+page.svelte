@@ -8,7 +8,7 @@
 		setOpponent,
 		useEvent
 	} from '$lib/connection.svelte';
-	import { characters, initializeCharacters, type Character } from '$lib/characters';
+	import { characters, Element, initializeCharacters, type Character } from '$lib/characters';
 	import { onMount } from 'svelte';
 	import { postRequestURL } from '$lib/requests';
 
@@ -23,6 +23,7 @@
 	let maxCharacterAmount = $state(4);
 	let hoveredCharacter = $state<Character | null>(null);
 	let tooltipPosition = $state({ x: 0, y: 0 });
+	let tooltipBelow = $state(false);
 
 	onMount(() => {
 		if (!currentLobby) {
@@ -126,10 +127,33 @@
 	function handleMouseEnter(character: Character, event: MouseEvent) {
 		hoveredCharacter = character;
 		const rect = (event.target as HTMLElement).getBoundingClientRect();
-		tooltipPosition = {
-			x: rect.left + rect.width / 2,
-			y: rect.top - 10
-		};
+
+		// Estimate tooltip dimensions (adjust these based on your tooltip size)
+		const tooltipWidth = 320; // max-w-sm is approximately 320px
+		const tooltipHeight = 400; // estimate based on content
+		const padding = 16; // padding from screen edges
+
+		let x = rect.left + rect.width / 2;
+		let y = rect.top - 10;
+		let showBelow = false;
+
+		// Horizontal boundary checks
+		const halfTooltipWidth = tooltipWidth / 2;
+		if (x - halfTooltipWidth < padding) {
+			x = halfTooltipWidth + padding;
+		} else if (x + halfTooltipWidth > window.innerWidth - padding) {
+			x = window.innerWidth - halfTooltipWidth - padding;
+		}
+
+		// Vertical boundary checks
+		if (y - tooltipHeight < padding) {
+			// If tooltip would go above screen, show it below the character instead
+			y = rect.bottom + 10;
+			showBelow = true;
+		}
+
+		tooltipPosition = { x, y };
+		tooltipBelow = showBelow;
 	}
 
 	function handleMouseLeave() {
@@ -139,17 +163,17 @@
 	function getElementColor(element: string): string {
 		switch (element) {
 			case 'fire':
-				return '#ff6b35';
+				return '#c42430';
 			case 'water':
-				return '#4dabf7';
+				return '#0069aa';
 			case 'earth':
-				return '#8bc34a';
+				return '#1e6f50';
 			case 'air':
-				return '#e0e0e0';
+				return '#5d5d5d';
 			case 'dark':
-				return '#6c5ce7';
+				return '#622461';
 			case 'light':
-				return '#fdcb6e';
+				return '#ed7614';
 			default:
 				return '#95a5a6';
 		}
@@ -248,7 +272,9 @@
 <!-- Character Tooltip -->
 {#if hoveredCharacter && hoveredCharacter.actions}
 	<div
-		class="fixed z-50 pointer-events-none transform -translate-x-1/2 -translate-y-full"
+		class="fixed z-50 pointer-events-none transform -translate-x-1/2 {tooltipBelow
+			? ''
+			: '-translate-y-full'}"
 		style="left: {tooltipPosition.x}px; top: {tooltipPosition.y}px;"
 	>
 		<div class="bg-bg-800 border-2 border-bg-300 rounded-lg p-4 shadow-lg max-w-sm">
@@ -279,19 +305,25 @@
 					<div class="bg-bg-700 border border-bg-400 rounded p-2">
 						<div class="flex justify-between items-start mb-1">
 							<span class="font-pixel text-bg-100 text-sm">{action.name}</span>
-							<span
-								class="px-1 py-0.5 rounded text-xs font-pixel"
-								style="background-color: {getElementColor(action.element)}; color: white;"
-							>
-								{action.element}
-							</span>
+							{#if action.element != Element.None}
+								<span
+									class="px-3 py-2 rounded text-xs font-pixel"
+									style="background-color: {getElementColor(action.element)}; color: white;"
+								>
+									{action.element}
+								</span>
+							{/if}
 						</div>
-						<p class="font-pixel text-bg-200 text-xs mb-2">{action.description}</p>
+						<p class="font-pixel text-bg-200 text-xs">{action.description}</p>
 						<div class="flex gap-3 text-xs font-pixel">
-							<span class="text-red-400">DMG: {action.Damage}</span>
-							<span class="text-blue-400">MANA: {action.ManaCost}</span>
+							{#if action.Damage}
+								<span class="text-red-400 mt-2">DMG: {action.Damage}</span>
+							{/if}
+							{#if action.ManaCost}
+								<span class="text-blue-400 mt-2">MANA: {action.ManaCost}</span>
+							{/if}
 							{#if action.Oversight}
-								<span class="text-yellow-400">OVERSIGHT</span>
+								<span class="text-yellow-400 mt-2">OVERSIGHT</span>
 							{/if}
 						</div>
 					</div>
