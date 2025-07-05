@@ -38,5 +38,6 @@ func NewDamageAction(id uint, name string, description string, damage int, eleme
 
 type ActionResult struct {
 	DamageToCharacter *int
+	HealToCharacter   *int
 	DamageElement     Element
 }

@@ -19,9 +19,8 @@ func StatusEffectDodge(turns int) StatusEffect {
 		TurnsRemaining: turns,
 		OnHit: func(current, from *Character, action *Action, result ActionResult) *ActionResult {
 			if action.Damage > 0 && !action.Oversight {
-				return &ActionResult{
-					DamageToCharacter: util.Ptr(0),
-				}
+				result.DamageToCharacter = util.Ptr(0)
+				return &result
 			}
 			return nil
 		},
@@ -48,9 +47,8 @@ func StatusEffectInvulnerable(turns int) StatusEffect {
 		Visible:        true,
 		TurnsRemaining: turns,
 		OnHit: func(current, from *Character, action *Action, result ActionResult) *ActionResult {
-			return &ActionResult{
-				DamageToCharacter: util.Ptr(0),
-			}
+			result.DamageToCharacter = util.Ptr(0)
+			return &result
 		},
 	}
 }
@@ -61,9 +59,8 @@ func StatusEffectReducedDamage(percentage float64) StatusEffect {
 		Visible:        false,
 		TurnsRemaining: 0,
 		OnHit: func(current, from *Character, action *Action, result ActionResult) *ActionResult {
-			return &ActionResult{
-				DamageToCharacter: util.Ptr(int(float64(action.Damage) * percentage)),
-			}
+			result.DamageToCharacter = util.Ptr(int(float64(action.Damage) * percentage))
+			return &result
 		},
 	}
 }
@@ -79,7 +76,39 @@ func StatusEffectRemoveMana(amount int) StatusEffect {
 			} else {
 				current.relatedPlayer.Mana -= amount
 			}
-			return &result
+			return nil
+		},
+	}
+}
+
+// Create a status effect that removes mana from the targeted player
+func StatusEffectStealMana() StatusEffect {
+	return StatusEffect{
+		Visible:        false,
+		TurnsRemaining: 0,
+		OnHit: func(current, from *Character, action *Action, result ActionResult) *ActionResult {
+			current.relatedPlayer.Mana += *result.DamageToCharacter
+			from.relatedPlayer.Mana -= *result.DamageToCharacter
+			return nil
+		},
+	}
+}
+
+// Create a status effect that removed damage from the attack and heals the person
+func StatusEffectTurnDmgHeal(damageRed int) StatusEffect {
+	return StatusEffect{
+		Visible:        false,
+		TurnsRemaining: 0,
+		OnHit: func(current, from *Character, action *Action, result ActionResult) *ActionResult {
+			if *result.DamageToCharacter <= damageRed {
+				result.HealToCharacter = util.Ptr(*result.DamageToCharacter)
+				result.DamageToCharacter = util.Ptr(0)
+				return &result
+			} else {
+				result.DamageToCharacter = util.Ptr(*result.DamageToCharacter - damageRed)
+				result.HealToCharacter = util.Ptr(damageRed)
+				return &result
+			}
 		},
 	}
 }
