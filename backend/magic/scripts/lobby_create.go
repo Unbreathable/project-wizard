@@ -7,7 +7,7 @@ import (
 	"github.com/Liphium/project-wizard/backend/util/requests"
 )
 
-func RunLobbyCreate(p *mconfig.Plan, username string) {
+func RunLobbyCreate(p *mconfig.Plan, username string) requests.Map {
 	res, err := requests.PostRequestURL("http://localhost:"+p.Environment["PORT"]+"/lobby/create", requests.Map{"name": username})
 	if err != nil {
 		log.Fatalln("couldn't do create lobby request:", err)
@@ -16,6 +16,10 @@ func RunLobbyCreate(p *mconfig.Plan, username string) {
 		log.Fatalln("request error:", requests.ValueOr(res, "message", "?"))
 	}
 
-	log.Printf("Lobby id: %s", requests.ValueOr(res, "lobby_id", "no id"))
-	log.Printf("Player id: %s", requests.ValueOr(res, "player_id", "no id"))
+	lobbyId := requests.ValueOr(res, "lobby_id", "no id")
+	playerId := requests.ValueOr(res, "player_id", "no id")
+
+	log.Printf("Lobby id: %s", lobbyId)
+	log.Printf("Player id: %s", playerId)
+	return res
 }

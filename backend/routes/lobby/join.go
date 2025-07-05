@@ -41,10 +41,16 @@ func joinLobby(c *fiber.Ctx) error {
 		return integration.InvalidRequest(c, "lobby is full")
 	}
 
-	lobby.SetNamePlayer2(req.Name)
+	if err := lobby.SetNamePlayer(2, req.Name); err != nil {
+		return integration.InvalidRequest(c, "server error")
+	}
+	p2, err := lobby.GetPlayer(2)
+	if err != nil {
+		return integration.InvalidRequest(c, "server error")
+	}
 
 	return c.JSON(LobbyJoinResponse{
 		Success:  true,
-		PlayerId: lobby.GetPlayer2().ID,
+		PlayerId: p2.ID,
 	})
 }

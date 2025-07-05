@@ -6,4 +6,6 @@ func LobbyRoutes(router fiber.Router) {
 	router.Post("/create", createLobby)
 	router.Post("/info", infoLobby)
 	router.Post("/join", joinLobby)
+	router.Post("/ready", readyLobby)
+	router.Post("/unready", unreadyLobby)
 }

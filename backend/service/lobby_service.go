@@ -3,19 +3,18 @@ package service
 import (
 	"sync"
 
+	"github.com/Liphium/project-wizard/backend/game"
 	"github.com/google/uuid"
 )
 
-type Lobby struct {
-	mutex   sync.Mutex
-	id      string
-	player1 Player
-	player2 Player
-}
+const CharacterAmount = 4
 
-type Player struct {
-	ID   string `json:"player_id"`
-	Name string `json:"name"`
+type Lobby struct {
+	mutex     sync.Mutex
+	id        string            // uuid strings
+	playersId []string          // uuid strings
+	players   map[string]Player // uuid strings
+	game      *game.Game
 }
 
 var lobbies sync.Map
@@ -42,18 +41,26 @@ func CreateLobby(name string) (lobbyId string, playerID string) {
 		player2ID = uuid.New().String()
 	}
 
+	playerMap := map[string]Player{
+		playerID: Player{
+			Name:  name,
+			ID:    playerID,
+			Ready: false,
+		},
+		player2ID: Player{
+			Name:  "",
+			ID:    player2ID,
+			Ready: false,
+		},
+	}
+
 	// Store lobby
 	lobbies.Store(lobbyId, &Lobby{
-		mutex: sync.Mutex{},
-		id:    lobbyId,
-		player1: Player{
-			Name: name,
-			ID:   playerID,
-		},
-		player2: Player{
-			Name: "",
-			ID:   player2ID,
-		},
+		mutex:     sync.Mutex{},
+		id:        lobbyId,
+		playersId: []string{playerID, player2ID},
+		players:   playerMap,
+		game:      nil,
 	})
 	return lobbyId, playerID
 }
@@ -75,31 +82,11 @@ func GetLobby(lobbyId string) (*Lobby, bool) {
 func (lobby *Lobby) IsFull() bool {
 	lobby.mutex.Lock()
 	defer lobby.mutex.Unlock()
-	return lobby.player2.Name != ""
+	return lobby.players[lobby.playersId[1]].Name != ""
 }
 
-func (lobby *Lobby) GetPlayer1() Player {
+func (lobby *Lobby) IsRunning() bool {
 	lobby.mutex.Lock()
 	defer lobby.mutex.Unlock()
-	return lobby.player1
-}
-
-func (lobby *Lobby) GetPlayer2() Player {
-	lobby.mutex.Lock()
-	defer lobby.mutex.Unlock()
-	return lobby.player2
-}
-
-func (lobby *Lobby) SetNamePlayer1(name string) {
-	lobby.mutex.Lock()
-	defer lobby.mutex.Unlock()
-
-	lobby.player1.Name = name
-}
-
-func (lobby *Lobby) SetNamePlayer2(name string) {
-	lobby.mutex.Lock()
-	defer lobby.mutex.Unlock()
-
-	lobby.player2.Name = name
+	return lobby.game != nil
 }

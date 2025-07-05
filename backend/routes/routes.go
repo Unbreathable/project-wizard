@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	game_routes "github.com/Liphium/project-wizard/backend/routes/game"
 	lobby_routes "github.com/Liphium/project-wizard/backend/routes/lobby"
 	"github.com/Liphium/project-wizard/backend/service"
 	"github.com/Liphium/project-wizard/neogate"
@@ -17,6 +18,9 @@ func SetupRoutes(router fiber.Router) {
 
 	// lobby routes
 	router.Route("/lobby", lobby_routes.LobbyRoutes)
+
+	// game routes
+	router.Route("/game", game_routes.GameRoutes)
 }
 
 // Setup neogate

@@ -7,7 +7,7 @@ import (
 	"github.com/Liphium/project-wizard/backend/util/requests"
 )
 
-func RunLobbyJoin(p *mconfig.Plan, username string, lobbyId string) {
+func RunLobbyJoin(p *mconfig.Plan, username string, lobbyId string) requests.Map {
 	res, err := requests.PostRequestURL("http://localhost:"+p.Environment["PORT"]+"/lobby/join", requests.Map{"name": username, "lobby_id": lobbyId})
 	if err != nil {
 		log.Fatalln("couldn't do join lobby request:", err)
@@ -17,4 +17,5 @@ func RunLobbyJoin(p *mconfig.Plan, username string, lobbyId string) {
 	}
 
 	log.Printf("Player id: %s", requests.ValueOr(res, "player_id", "no id"))
+	return res
 }

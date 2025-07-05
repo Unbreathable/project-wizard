@@ -11,9 +11,13 @@ type LobbyInfoRequest struct {
 }
 
 type LobbyInfoResponse struct {
-	Success bool   `json:"success"`
-	Player1 string `json:"player_1"`
-	Player2 string `json:"player_2"`
+	Success         bool   `json:"success"`
+	Player1         string `json:"player_1"`
+	Player2         string `json:"player_2"`
+	Player1Ready    bool   `json:"player_1_ready"`
+	Player2Ready    bool   `json:"player_2_ready"`
+	CharacterAmount int    `json:"character_amount"`
+	Running         bool   `json:"running"`
 }
 
 // Route: /lobby/info
@@ -28,12 +32,25 @@ func infoLobby(c *fiber.Ctx) error {
 
 	lobby, ok := service.GetLobby(req.LobbyId)
 	if !ok {
-		return integration.InvalidRequest(c, "invalid id")
+		return integration.InvalidRequest(c, "invalid lobby id")
+	}
+
+	p1, err := lobby.GetPlayer(1)
+	if err != nil {
+		return integration.InvalidRequest(c, "server error")
+	}
+	p2, err := lobby.GetPlayer(2)
+	if err != nil {
+		return integration.InvalidRequest(c, "server error")
 	}
 
 	return c.JSON(LobbyInfoResponse{
-		Success: true,
-		Player1: lobby.GetPlayer1().Name,
-		Player2: lobby.GetPlayer2().Name,
+		Success:         true,
+		Player1:         p1.Name,
+		Player2:         p2.Name,
+		Player1Ready:    p1.Ready,
+		Player2Ready:    p2.Ready,
+		CharacterAmount: service.CharacterAmount,
+		Running:         lobby.IsRunning(),
 	})
 }
