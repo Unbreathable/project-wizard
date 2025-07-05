@@ -18,11 +18,11 @@ type Game struct {
 	playerSwaps   map[string][]int
 }
 
-func (game *Game) IsReady() bool {
-	game.mutex.Lock()
-	defer game.mutex.Unlock()
+func (g *Game) IsReady() bool {
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
 
-	for _, v := range game.playersReady {
+	for _, v := range g.playersReady {
 		if !v {
 			return v
 		}
@@ -30,36 +30,36 @@ func (game *Game) IsReady() bool {
 	return true
 }
 
-func (game *Game) IsPlayerReady(playerID string) bool {
-	game.mutex.Lock()
-	defer game.mutex.Unlock()
+func (g *Game) IsPlayerReady(playerID string) bool {
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
 
-	ready, ok := game.playersReady[playerID]
+	ready, ok := g.playersReady[playerID]
 	if !ok {
 		return ok
 	}
 	return ready
 }
 
-func (game *Game) SetPlayerReady(playerID string, ready bool) {
-	game.mutex.Lock()
-	defer game.mutex.Unlock()
+func (g *Game) SetPlayerReady(playerID string, ready bool) {
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
 
-	game.playersReady[playerID] = ready
+	g.playersReady[playerID] = ready
 }
 
 // Removes the players actions
-func (game *Game) RemovePlayerActions(playerId string) {
-	game.playerActions[playerId] = []game.GameAction{}
-	game.playerSwaps[playerId] = []int{}
+func (g *Game) RemovePlayerActions(playerId string) {
+	g.playerActions[playerId] = []game.GameAction{}
+	g.playerSwaps[playerId] = []int{}
 }
 
 // Verify the a player's actions to make sure they are valid in the simulation.
-func (game *Game) VerifyPlayerActions(playerId string, actions []game.GameAction, swap []int) bool {
-	game.mutex.Lock()
-	defer game.mutex.Unlock()
+func (g *Game) VerifyPlayerActions(playerId string, actions []game.GameAction, swap []int) bool {
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
 
-	player, _, err := game.relatedLobby.GetPlayerById(playerId)
+	player, _, err := g.relatedLobby.GetPlayerById(playerId)
 	if err != nil {
 		return false
 	}
