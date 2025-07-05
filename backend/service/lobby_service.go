@@ -80,6 +80,14 @@ func GetLobby(lobbyId string) (*Lobby, bool) {
 	return value.(*Lobby), true
 }
 
+// Returns pointer to game
+func (lobby *Lobby) GetGame() *Game {
+	lobby.mutex.Lock()
+	defer lobby.mutex.Unlock()
+
+	return lobby.game
+}
+
 func (lobby *Lobby) IsFull() bool {
 	lobby.mutex.Lock()
 	defer lobby.mutex.Unlock()

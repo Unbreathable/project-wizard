@@ -43,6 +43,10 @@ func readyLobby(c *fiber.Ctx) error {
 		return integration.InvalidRequest(c, "invalid player id")
 	}
 
+	if lobby.IsRunning() {
+		return integration.InvalidRequest(c, "game is running")
+	}
+
 	p1, err := lobby.GetPlayer(1)
 	if err != nil {
 		return integration.InvalidRequest(c, "server error")

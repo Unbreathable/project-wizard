@@ -10,7 +10,7 @@ const NormalActionsPerTurn = 1
 type GameAction struct {
 	CharacterId uint   `json:"char_id" validate:"required"`
 	ActionId    uint   `json:"action_id" validate:"required"`
-	Target      string `json:"target" validate:"required"` // Targetted player
+	Target      string `json:"target" validate:"required"` // Targetted player id
 	Slot        uint   `json:"slot" validate:"required"`   // Targetted slot id
 }
 
@@ -35,8 +35,32 @@ func (game *Game) IsReady() bool {
 	return true
 }
 
+func (game *Game) IsPlayerReady(playerID string) bool {
+	game.mutex.Lock()
+	defer game.mutex.Unlock()
+
+	ready, ok := game.playersReady[playerID]
+	if !ok {
+		return ok
+	}
+	return ready
+}
+
+func (game *Game) SetPlayerReady(playerID string, ready bool) {
+	game.mutex.Lock()
+	defer game.mutex.Unlock()
+
+	game.playersReady[playerID] = ready
+}
+
+// Removes the players actions
+func (game *Game) RemovePlayerActions(playerId string) {
+	game.playerActions[playerId] = []GameAction{}
+	game.playerSwaps[playerId] = []int{}
+}
+
 // Verify the a player's actions to make sure they are valid in the simulation.
-func (game *Game) VerifyPlayerActions(playerId string) bool {
+func (game *Game) VerifyPlayerActions(playerId string, actions []GameAction, swap []int) bool {
 	game.mutex.Lock()
 	defer game.mutex.Unlock()
 
@@ -47,18 +71,21 @@ func (game *Game) VerifyPlayerActions(playerId string) bool {
 
 	// Check swap amount
 	characterLen := len(player.GamePlayer.Characters)
-	swaps := game.playerSwaps[playerId]
-	if len(swaps) == 2 {
-		if swaps[0] == swaps[1] || swaps[0] > characterLen-1 || swaps[1] > characterLen-1 {
+	if len(swap) == 2 {
+		if swap[0] == swap[1] || swap[0] > characterLen-1 || swap[1] > characterLen-1 {
 			return false
 		}
-		if player.GamePlayer.Characters[swaps[0]].IsDead() || player.GamePlayer.Characters[swaps[1]].IsDead() {
+		if player.GamePlayer.Characters[swap[0]].IsDead() || player.GamePlayer.Characters[swap[1]].IsDead() {
 			return false
 		}
 	}
-	if len(swaps) != 2 && len(swaps) != 0 {
+	if len(swap) != 2 && len(swap) != 0 {
 		return false
 	}
+
+	// TODO: verify actions
+
+	// Set player status ready
 
 	return true
 
