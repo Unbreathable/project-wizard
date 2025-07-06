@@ -16,11 +16,11 @@ type LobbyMode string
 
 // All the elements
 const (
-	LobyMode1vs1 LobbyMode = "1vs1"
+	LobbyMode1vs1 LobbyMode = "1vs1"
 )
 
 var LobbyModes = []LobbyMode{
-	LobyMode1vs1,
+	LobbyMode1vs1,
 }
 
 type Lobby struct {

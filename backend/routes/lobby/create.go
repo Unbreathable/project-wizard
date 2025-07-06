@@ -57,7 +57,7 @@ func createLobby(c *fiber.Ctx) error {
 
 	// Create teams and players according to mode
 	switch req.Mode {
-	case service.LobyMode1vs1:
+	case service.LobbyMode1vs1:
 
 		// Create two teams with one player each
 		team1 := lobby.NewTeam(1)

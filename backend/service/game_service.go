@@ -132,7 +132,7 @@ func (g *Game) StartTurn() error {
 	defer g.mutex.Unlock()
 
 	switch g.relatedLobby.GetInfo().Mode {
-	case LobyMode1vs1:
+	case LobbyMode1vs1:
 		teams := g.relatedLobby.GetTeams()
 		if len(teams) != 2 {
 			return fmt.Errorf("bad teams")
