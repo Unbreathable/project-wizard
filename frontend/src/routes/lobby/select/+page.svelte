@@ -264,7 +264,7 @@
 			: '-translate-y-full'}"
 		style="left: {tooltipPosition.x}px; top: {tooltipPosition.y}px;"
 	>
-		<div class="bg-bg-800 border-2 border-bg-300 rounded-lg p-4 shadow-lg max-w-sm">
+		<div class="bg-bg-800 border-2 border-bg-300 p-4 shadow-lg max-w-sm">
 			<div class="mb-3">
 				<h3 class="font-pixel text-bg-100 text-lg mb-1">
 					{hoveredCharacter.name || `Character ${hoveredCharacter.id}`}
@@ -273,7 +273,7 @@
 					<p class="font-pixel text-bg-200 text-xs mb-2">from {hoveredCharacter.origin}</p>
 				{/if}
 				{#if hoveredCharacter.elements && hoveredCharacter.elements.length > 0}
-					<div class="flex gap-1 mb-2">
+					<div class="flex gap-3 mb-2">
 						{#each hoveredCharacter.elements as element}
 							<span
 								class="px-2 py-1 rounded text-xs font-pixel"
@@ -286,15 +286,14 @@
 				{/if}
 			</div>
 
-			<div class="space-y-2">
-				<h4 class="font-pixel text-bg-100 text-sm">Actions:</h4>
+			<div class="flex flex-col mt-2 gap-2 space-y-2">
 				{#each Object.values(hoveredCharacter.actions) as action}
-					<div class="bg-bg-700 border border-bg-400 rounded p-2">
+					<div class="bg-bg-700 border border-bg-400 p-2">
 						<div class="flex justify-between items-start mb-1">
 							<span class="font-pixel text-bg-100 text-sm">{action.name}</span>
 							{#if action.element != Element.None}
 								<span
-									class="px-3 py-2 rounded text-xs font-pixel"
+									class="px-2 py-1 rounded text-xs font-pixel"
 									style="background-color: {getElementColor(action.element)}; color: white;"
 								>
 									{action.element}
@@ -302,7 +301,7 @@
 							{/if}
 						</div>
 						<p class="font-pixel text-bg-200 text-xs">{action.description}</p>
-						<div class="flex gap-3 text-xs font-pixel">
+						<div class="flex gap-6 text-xs font-pixel">
 							{#if action.damage}
 								<span class="text-red-400 mt-2">DMG: {action.damage}</span>
 							{/if}

@@ -23,7 +23,7 @@ export enum Element {
 			case 'dark':
 				return '#622461';
 			case 'light':
-				return '#ed7614';
+				return '#c64524';
 			default:
 				return '#95a5a6';
 		}
