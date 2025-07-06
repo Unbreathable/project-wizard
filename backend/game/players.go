@@ -17,3 +17,11 @@ func (player *GamePlayer) GetCharacterById(charId uint) *Character {
 	}
 	return player.Characters[ind]
 }
+
+func (player *GamePlayer) GetCharacters() []Character {
+	chars := []Character{}
+	for _, v := range player.Characters {
+		chars = append(chars, *v)
+	}
+	return chars
+}

@@ -13,12 +13,6 @@ type LobbyJoinRequest struct {
 	Name    string `json:"name" validate:"required"`
 }
 
-type LobbyJoinResponse struct {
-	Success  bool   `json:"success"`
-	PlayerId string `json:"player_id"`
-	Token    string `json:"token"`
-}
-
 // Route: /lobby/join
 func joinLobby(c *fiber.Ctx) error {
 	var req LobbyJoinRequest
@@ -42,18 +36,33 @@ func joinLobby(c *fiber.Ctx) error {
 		return integration.InvalidRequest(c, "lobby is full")
 	}
 
-	if err := lobby.SetNamePlayer(2, req.Name); err != nil {
-		return integration.InvalidRequest(c, "server error")
-	}
-	p2, err := lobby.GetPlayer(2)
-	if err != nil {
-		return integration.InvalidRequest(c, "server error")
+	res := LobbyCreateResponse{
+		Success:  true,
+		LobbyId:  lobby.GetInfo().Id,
+		Mode:     lobby.GetInfo().Mode,
+		TeamId:   "",
+		PlayerId: "",
+		Token:    "",
 	}
 
-	p1, err := lobby.GetPlayer(1)
-	if err != nil {
-		return integration.InvalidRequest(c, "server error")
+	switch lobby.GetInfo().Mode {
+	case service.LobyMode1vs1:
+		for _, v := range lobby.GetTeams() {
+			if !v.IsFull() {
+				p := lobby.NewPlayer(req.Name)
+				v.AddPlayer(p) // error can be ignored because team is not full
+
+				info := p.GetInfo()
+
+				res.TeamId = v.GetId()
+				res.PlayerId = info.Id
+				res.Token = info.Token
+				break
+			}
+		}
 	}
+
+	// TODO: add lobby info event
 
 	// Send lobby join event to host
 	data, err := GetLobbyInfo(req.LobbyId)
@@ -62,9 +71,5 @@ func joinLobby(c *fiber.Ctx) error {
 	}
 	service.Instance.SendOne(p1.Token, LobbyChangeEvent(data))
 
-	return c.JSON(LobbyJoinResponse{
-		Success:  true,
-		PlayerId: p2.ID,
-		Token:    p2.Token,
-	})
+	return c.JSON()
 }

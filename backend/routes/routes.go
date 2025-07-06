@@ -48,9 +48,10 @@ func setupNeo(router fiber.Router) {
 					players := lobby.GetPlayers()
 					service.RemoveLobby(neoAtt.LobbyId)
 					for _, p := range players {
-						data, err := encodeSession(NeogateTokenAttachment{PlayerId: p.ID, LobbyId: neoAtt.LobbyId})
+						pInfo := p.GetInfo()
+						data, err := encodeSession(NeogateTokenAttachment{PlayerId: pInfo.Id, LobbyId: neoAtt.LobbyId})
 						if err == nil {
-							service.Instance.Disconnect(p.Token, data)
+							service.Instance.Disconnect(pInfo.Token, data)
 						}
 					}
 				}
@@ -99,7 +100,7 @@ func setupNeo(router fiber.Router) {
 			if !ok {
 				return clientInfo, false
 			}
-			if lobby.GetPlayerTokenById(neoAtt.PlayerId) != token {
+			if lobby.GetPlayer(neoAtt.PlayerId).GetInfo().Token != token {
 				return clientInfo, false
 			}
 

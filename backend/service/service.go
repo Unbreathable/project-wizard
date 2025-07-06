@@ -22,8 +22,13 @@ type SimulationResult struct {
 	Characters []game.Character `json:"characters"`
 }
 
+type PlayerReady struct {
+	Id    string `json:"id"`
+	Ready bool   `json:"ready"`
+}
+
 // Event for game start
-func GameStartEvent(data map[string][]game.Character) neogate.Event {
+func GameStartEvent(data map[string]map[string][]game.Character) neogate.Event {
 	return neogate.Event{
 		Name: "game_start",
 		Data: fiber.Map{
@@ -33,12 +38,11 @@ func GameStartEvent(data map[string][]game.Character) neogate.Event {
 }
 
 // Event for game infos
-func GameInfoEvent(p1Ready bool, p2Ready bool) neogate.Event {
+func GameInfoEvent(players []PlayerReady) neogate.Event {
 	return neogate.Event{
 		Name: "game_info",
 		Data: fiber.Map{
-			"player1_ready": p1Ready,
-			"player2_ready": p2Ready,
+			"players": players,
 		},
 	}
 }

@@ -33,7 +33,7 @@ func turnGame(c *fiber.Ctx) error {
 	}
 
 	// verify player token
-	if lobby.GetPlayerTokenById(req.PlayerId) != req.Token {
+	if lobby.GetPlayer(req.PlayerId).GetInfo().Token != req.Token {
 		return integration.InvalidRequest(c, "bad token")
 	}
 
@@ -56,26 +56,25 @@ func turnGame(c *fiber.Ctx) error {
 	}
 
 	// Ready player
-	game.SetPlayerReady(req.PlayerId, true)
+	lobby.GetPlayer(req.PlayerId).SetReadyTurn(true)
 
-	// Check if both player have locked in their turns
+	// Check if all players have locked in their turns
 	if game.IsReady() {
 		game.StartTurn()
 	}
 
-	p1, err := lobby.GetPlayer(1)
-	if err != nil {
-		return integration.InvalidRequest(c, "server error")
+	// Collect player status for event
+	playerReady := []service.PlayerReady{}
+	for _, v := range lobby.GetPlayers() {
+		info := v.GetInfo()
+		playerReady = append(playerReady, service.PlayerReady{
+			Id:    info.Id,
+			Ready: info.ReadyTurn,
+		})
 	}
-	p2, err := lobby.GetPlayer(2)
-	if err != nil {
-		return integration.InvalidRequest(c, "server error")
-	}
-
-	lobby.GetGame().IsPlayerReady(p1.ID)
 
 	// Send game status change event to players
-	service.Instance.Send([]string{p1.Token, p2.Token}, service.GameInfoEvent(lobby.GetGame().IsPlayerReady(p1.ID), lobby.GetGame().IsPlayerReady(p2.ID)))
+	service.Instance.Send(lobby.GetSpectator(), service.GameInfoEvent(playerReady))
 
 	return integration.SuccessfulRequest(c)
 }

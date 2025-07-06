@@ -7,8 +7,9 @@ import (
 type GameAction struct {
 	CharacterId uint   `json:"char_id" validate:"required"`
 	ActionId    uint   `json:"action_id" validate:"required"`
-	Target      string `json:"target" validate:"required"` // Targetted player
-	Slot        int    `json:"slot" validate:"required"`   // Targetted slot id
+	Target      string `json:"target" validate:"required"`      // Targetted player id
+	TargetTeam  string `json:"target_team" validate:"required"` // Targetted team id
+	Slot        int    `json:"slot" validate:"required"`        // Targetted slot id
 }
 
 func RunSimulation(players []*GamePlayer, actions map[string][]GameAction, swaps map[string][]int) error {

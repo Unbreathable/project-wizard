@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+	"maps"
 	"slices"
 	"sync"
 
@@ -10,47 +12,45 @@ import (
 const OversightsPerTurn = 1
 const NormalActionsPerTurn = 1
 
-type Game struct {
-	mutex        *sync.Mutex
-	relatedLobby *Lobby
-
-	playersReady  map[string]bool
+type Fight struct {
 	playerActions map[string][]game.GameAction
 	playerSwaps   map[string][]int
 }
 
+type Game struct {
+	mutex        *sync.Mutex
+	relatedLobby *Lobby
+
+	playerActions map[string][]game.GameAction
+	playerSwaps   map[string][]int
+}
+
+// Are all players ready for next turn
 func (g *Game) IsReady() bool {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 
-	for _, v := range g.playersReady {
-		if !v {
-			return v
+	for _, p := range g.relatedLobby.GetPlayers() {
+		if !p.GetInfo().ReadyTurn {
+			return false
 		}
 	}
 	return true
 }
 
+// Is the player ready for the next turn
 func (g *Game) IsPlayerReady(playerID string) bool {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 
-	ready, ok := g.playersReady[playerID]
-	if !ok {
-		return ok
-	}
-	return ready
-}
-
-func (g *Game) SetPlayerReady(playerID string, ready bool) {
-	g.mutex.Lock()
-	defer g.mutex.Unlock()
-
-	g.playersReady[playerID] = ready
+	return g.relatedLobby.GetPlayer(playerID).GetInfo().ReadyTurn
 }
 
 // Removes the players actions
 func (g *Game) RemovePlayerActions(playerId string) {
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
+
 	g.playerActions[playerId] = []game.GameAction{}
 	g.playerSwaps[playerId] = []int{}
 }
@@ -60,18 +60,16 @@ func (g *Game) VerifyPlayerActions(playerId string, actions []game.GameAction, s
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 
-	player, _, err := g.relatedLobby.GetPlayerById(playerId)
-	if err != nil {
-		return false
-	}
+	player := g.relatedLobby.GetPlayer(playerId)
 
 	// Check swap amount
-	characterLen := len(player.GamePlayer.Characters)
+	chars := player.GetGamePlayerState().Characters
+	characterLen := len(chars)
 	if len(swap) == 2 {
 		if swap[0] == swap[1] || swap[0] > characterLen-1 || swap[1] > characterLen-1 {
 			return false
 		}
-		if player.GamePlayer.Characters[swap[0]].IsDead() || player.GamePlayer.Characters[swap[1]].IsDead() {
+		if chars[swap[0]].IsDead() || chars[swap[1]].IsDead() {
 			return false
 		}
 	}
@@ -83,8 +81,8 @@ func (g *Game) VerifyPlayerActions(playerId string, actions []game.GameAction, s
 	oversights := 0
 	normal := 0
 	for _, action := range actions {
-		character := player.GamePlayer.GetCharacterById(action.CharacterId)
-		if len(character.Actions) < int(action.ActionId)+1 || character.IsDead() {
+		character := player.GetGamePlayer().GetCharacterById(action.CharacterId)
+		if character == nil || len(character.Actions) < int(action.ActionId)+1 || character.IsDead() {
 			return false
 		}
 
@@ -104,57 +102,77 @@ func (g *Game) VerifyPlayerActions(playerId string, actions []game.GameAction, s
 		neededMana += attack.ManaCost
 
 		// Check if the selected slots are correct
-		targetPlayer, _, err := g.relatedLobby.GetPlayerById(action.Target)
-		if err != nil {
+		tt := g.relatedLobby.GetTeam(action.TargetTeam)
+		if tt == nil {
 			return false
 		}
-		targetChars := targetPlayer.GamePlayer.Characters
+		targetPlayer := tt.GetPlayer(action.Target)
+		if targetPlayer == nil {
+			return false
+		}
+
+		targetChars := targetPlayer.GetGamePlayer().Characters
 		if len(targetChars) < action.Slot+1 || targetChars[action.Slot].IsDead() {
 			return false
 		}
+
 	}
 
 	// Check mana and action type
-	if neededMana > player.GamePlayer.Mana || oversights > OversightsPerTurn || normal > NormalActionsPerTurn {
+	if neededMana > player.GetGamePlayerState().Mana || oversights > OversightsPerTurn || normal > NormalActionsPerTurn {
 		return false
 	}
 
 	return true
 }
 
-func (g *Game) StartTurn() {
-	p1, err := g.relatedLobby.GetPlayer(1)
-	p2, err := g.relatedLobby.GetPlayer(2)
-	err = game.RunSimulation([]*game.GamePlayer{p1.GamePlayer, p2.GamePlayer}, g.playerActions, g.playerSwaps)
-	if err != nil {
-		// TODO: error handling
-	}
+// Current implementation only for 1vs1
+func (g *Game) StartTurn() error {
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
 
-	charsP1 := []game.Character{}
-	for _, c := range p1.GamePlayer.Characters {
-		charsP1 = append(charsP1, *c)
-	}
+	switch g.relatedLobby.GetInfo().Mode {
+	case LobyMode1vs1:
+		teams := g.relatedLobby.GetTeams()
+		if len(teams) != 2 {
+			return fmt.Errorf("bad teams")
+		}
 
-	charsP2 := []game.Character{}
-	for _, c := range p2.GamePlayer.Characters {
-		charsP2 = append(charsP2, *c)
-	}
+		var p1 *Player
+		var p2 *Player
 
-	// Send result of turn to clients
-	Instance.Send([]string{p1.Token, p2.Token}, GameUpdateEvent(SimulationResultEvent{
-		Swaps:   g.playerSwaps,
-		Actions: g.playerActions,
-		Result: map[string]SimulationResult{
-			p1.ID: {
-				Mana:       p1.GamePlayer.Mana,
-				ID:         p1.ID,
-				Characters: charsP1,
+		t1 := slices.Collect(maps.Values(teams))[0]
+		t2 := slices.Collect(maps.Values(teams))[1]
+
+		if len(t1.GetPlayers()) != 1 || len(t2.GetPlayers()) != 1 {
+			return fmt.Errorf("bad players")
+		}
+
+		p1 = slices.Collect(maps.Values(t1.GetPlayers()))[0]
+		p2 = slices.Collect(maps.Values(t2.GetPlayers()))[0]
+
+		err := game.RunSimulation([]*game.GamePlayer{p1.GetGamePlayer(), p2.GetGamePlayer()}, g.playerActions, g.playerSwaps)
+		if err != nil {
+			return err
+		}
+
+		// Send result of turn to clients
+		Instance.Send(g.relatedLobby.GetSpectator(), GameUpdateEvent(SimulationResultEvent{
+			Swaps:   g.playerSwaps,
+			Actions: g.playerActions,
+			Result: map[string]SimulationResult{
+				p1.GetInfo().Id: {
+					Mana:       p1.GetGamePlayer().Mana,
+					ID:         p1.GetInfo().Id,
+					Characters: p1.GetGamePlayer().GetCharacters(),
+				},
+				p2.GetInfo().Id: {
+					Mana:       p2.GetGamePlayer().Mana,
+					ID:         p2.GetInfo().Id,
+					Characters: p2.GetGamePlayer().GetCharacters(),
+				},
 			},
-			p2.ID: {
-				Mana:       p2.GamePlayer.Mana,
-				ID:         p2.ID,
-				Characters: charsP2,
-			},
-		},
-	}))
+		}))
+	}
+	return nil
 }

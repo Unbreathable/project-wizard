@@ -32,7 +32,7 @@ func removeTurnGame(c *fiber.Ctx) error {
 	}
 
 	// verify player token
-	if lobby.GetPlayerTokenById(req.PlayerId) != req.Token {
+	if lobby.GetPlayer(req.PlayerId).GetInfo().Token != req.Token {
 		return integration.InvalidRequest(c, "bad token")
 	}
 
@@ -53,21 +53,20 @@ func removeTurnGame(c *fiber.Ctx) error {
 	game.RemovePlayerActions(req.PlayerId)
 
 	// Unready player
-	game.SetPlayerReady(req.PlayerId, false)
+	lobby.GetPlayer(req.PlayerId).SetReadyTurn(false)
 
-	p1, err := lobby.GetPlayer(1)
-	if err != nil {
-		return integration.InvalidRequest(c, "server error")
+	// Collect player status for event
+	playerReady := []service.PlayerReady{}
+	for _, v := range lobby.GetPlayers() {
+		info := v.GetInfo()
+		playerReady = append(playerReady, service.PlayerReady{
+			Id:    info.Id,
+			Ready: info.ReadyTurn,
+		})
 	}
-	p2, err := lobby.GetPlayer(2)
-	if err != nil {
-		return integration.InvalidRequest(c, "server error")
-	}
-
-	lobby.GetGame().IsPlayerReady(p1.ID)
 
 	// Send game status change event to players
-	service.Instance.Send([]string{p1.Token, p2.Token}, service.GameInfoEvent(lobby.GetGame().IsPlayerReady(p1.ID), lobby.GetGame().IsPlayerReady(p2.ID)))
+	service.Instance.Send(lobby.GetSpectator(), service.GameInfoEvent(playerReady))
 
 	return integration.SuccessfulRequest(c)
 }
