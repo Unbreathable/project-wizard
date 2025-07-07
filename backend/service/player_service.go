@@ -79,3 +79,16 @@ func (p *Player) GetGamePlayerState() game.GamePlayer {
 
 	return *p.gamePlayer
 }
+
+func (p *Player) SetGamePlayer() *game.GamePlayer {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	p.gamePlayer = &game.GamePlayer{
+		ID:         p.id,
+		Mana:       0,
+		Characters: []*game.Character{},
+	}
+
+	return p.gamePlayer
+}

@@ -9,10 +9,15 @@ import (
 )
 
 type LobbyInfoEventData struct {
-	Player1         service.Player `json:"player_1"`
-	Player2         service.Player `json:"player_2"`
-	CharacterAmount int            `json:"character_amount"`
-	Running         bool           `json:"running"`
+	Teams           []TeamInfo `json:"teams"`
+	CharacterAmount int        `json:"character_amount"`
+	Running         bool       `json:"running"`
+}
+
+type TeamInfo struct {
+	Id      string               `json:"id"`
+	Size    int                  `json:"size"`
+	Players []service.PlayerInfo `json:"players"`
 }
 
 func LobbyRoutes(router fiber.Router) {
@@ -27,8 +32,7 @@ func LobbyChangeEvent(data LobbyInfoEventData) neogate.Event {
 	return neogate.Event{
 		Name: "lobby_change",
 		Data: fiber.Map{
-			"player_1":         data.Player1,
-			"player_2":         data.Player2,
+			"players":          data.Teams,
 			"character_amount": data.CharacterAmount,
 			"running":          data.Running,
 		},
@@ -42,18 +46,23 @@ func GetLobbyInfo(lobbyId string) (LobbyInfoEventData, error) {
 		return LobbyInfoEventData{}, fmt.Errorf("invalid lobby id")
 	}
 
-	p1, err := lobby.GetPlayer(1)
-	if err != nil {
-		return LobbyInfoEventData{}, fmt.Errorf("server error")
-	}
-	p2, err := lobby.GetPlayer(2)
-	if err != nil {
-		return LobbyInfoEventData{}, fmt.Errorf("server error")
+	teams := []TeamInfo{}
+
+	for _, t := range lobby.GetTeams() {
+		players := []service.PlayerInfo{}
+		for _, p := range t.GetPlayers() {
+			players = append(players, p.GetInfo())
+		}
+		team := TeamInfo{
+			Id:      t.GetId(),
+			Size:    t.GetSize(),
+			Players: players,
+		}
+		teams = append(teams, team)
 	}
 
 	return LobbyInfoEventData{
-		Player1:         p1,
-		Player2:         p2,
+		Teams:           teams,
 		CharacterAmount: service.CharacterAmount,
 		Running:         lobby.IsRunning(),
 	}, nil

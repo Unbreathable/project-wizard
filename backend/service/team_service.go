@@ -15,10 +15,16 @@ type Team struct {
 	players      map[string]*Player // player id -> *Player
 }
 
-func (team *Team) GetPlayers() map[string]*Player {
+func (team *Team) GetPlayers() []*Player {
 	team.mutex.Lock()
 	defer team.mutex.Unlock()
-	return team.players
+
+	players := []*Player{}
+	for _, player := range team.playerIds {
+		players = append(players, team.players[player])
+	}
+
+	return players
 }
 
 func (team *Team) GetPlayer(playerId string) *Player {

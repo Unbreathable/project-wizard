@@ -15,12 +15,13 @@ type LobbyCreateRequest struct {
 }
 
 type LobbyCreateResponse struct {
-	Success  bool              `json:"success"`
-	LobbyId  string            `json:"lobby_id"`
-	Mode     service.LobbyMode `json:"mode"`
-	TeamId   string            `json:"team_id"`
-	PlayerId string            `json:"player_id"`
-	Token    string            `json:"token"`
+	Success    bool              `json:"success"`
+	LobbyId    string            `json:"lobby_id"`
+	LobbyToken string            `json:"lobby_token"`
+	Mode       service.LobbyMode `json:"mode"`
+	TeamId     string            `json:"team_id"`
+	PlayerId   string            `json:"player_id"`
+	Token      string            `json:"token"`
 }
 
 // Route: /lobby/create

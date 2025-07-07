@@ -31,29 +31,26 @@ func unreadyLobby(c *fiber.Ctx) error {
 		return integration.InvalidRequest(c, "game is running")
 	}
 
+	player := lobby.GetPlayer(req.PlayerId)
+
 	// verify player token
-	if lobby.GetPlayerTokenById(req.PlayerId) != req.Token {
+	if player.GetInfo().Token != req.Token {
 		return integration.InvalidRequest(c, "bad token")
 	}
 
-	if err := lobby.SetReadyPlayerById(req.PlayerId, false); err != nil {
-		return integration.InvalidRequest(c, "invalid player id")
+	if !player.GetInfo().Ready {
+		return integration.InvalidRequest(c, "player isnt ready")
 	}
 
-	// Send lobby join event to players
+	// unready player
+	player.SetReady(false)
+
+	// Send lobby change event to players
 	data, err := GetLobbyInfo(req.LobbyId)
 	if err != nil {
 		return integration.InvalidRequest(c, err.Error())
 	}
-	p1, err := lobby.GetPlayer(1)
-	if err != nil {
-		return integration.InvalidRequest(c, "server error")
-	}
-	p2, err := lobby.GetPlayer(2)
-	if err != nil {
-		return integration.InvalidRequest(c, "server error")
-	}
-	service.Instance.Send([]string{p1.Token, p2.Token}, LobbyChangeEvent(data))
+	service.Instance.Send(lobby.GetPlayersTokens(), LobbyChangeEvent(data))
 
 	return integration.SuccessfulRequest(c)
 }

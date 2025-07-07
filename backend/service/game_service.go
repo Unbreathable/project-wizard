@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"maps"
 	"slices"
 	"sync"
 
@@ -141,15 +140,15 @@ func (g *Game) StartTurn() error {
 		var p1 *Player
 		var p2 *Player
 
-		t1 := slices.Collect(maps.Values(teams))[0]
-		t2 := slices.Collect(maps.Values(teams))[1]
+		t1 := teams[0]
+		t2 := teams[1]
 
 		if len(t1.GetPlayers()) != 1 || len(t2.GetPlayers()) != 1 {
 			return fmt.Errorf("bad players")
 		}
 
-		p1 = slices.Collect(maps.Values(t1.GetPlayers()))[0]
-		p2 = slices.Collect(maps.Values(t2.GetPlayers()))[0]
+		p1 = t1.GetPlayers()[0]
+		p2 = t2.GetPlayers()[0]
 
 		err := game.RunSimulation([]*game.GamePlayer{p1.GetGamePlayer(), p2.GetGamePlayer()}, g.playerActions, g.playerSwaps)
 		if err != nil {

@@ -1,7 +1,6 @@
 package service
 
 import (
-	"maps"
 	"sync"
 
 	"slices"
@@ -190,11 +189,16 @@ func (lobby *Lobby) GetTeam(teamId string) *Team {
 }
 
 // Returns the all teams
-func (lobby *Lobby) GetTeams() map[string]*Team {
+func (lobby *Lobby) GetTeams() []*Team {
 	lobby.mutex.Lock()
 	defer lobby.mutex.Unlock()
 
-	return lobby.teams
+	teams := []*Team{}
+	for _, team := range lobby.teamIds {
+		teams = append(teams, lobby.teams[team])
+	}
+
+	return teams
 }
 
 // Returns the all spectators
@@ -224,7 +228,7 @@ func (lobby *Lobby) GetPlayers() []*Player {
 
 	players := []*Player{}
 	for _, v := range lobby.teams {
-		players = append(players, slices.Collect(maps.Values(v.GetPlayers()))...)
+		players = append(players, v.GetPlayers()...)
 	}
 
 	return players
@@ -236,6 +240,19 @@ func (lobby *Lobby) GetPlayer(playerId string) *Player {
 	defer lobby.mutex.Unlock()
 
 	return lobby.players[playerId]
+}
+
+// Returns a list of all players tokens (no order)
+func (lobby *Lobby) GetPlayersTokens() []string {
+	lobby.mutex.Lock()
+	defer lobby.mutex.Unlock()
+
+	tokens := []string{}
+	for _, p := range lobby.players {
+		tokens = append(tokens, p.GetInfo().Token)
+	}
+
+	return tokens
 }
 
 // Return if all teams are full
@@ -261,6 +278,19 @@ func (lobby *Lobby) IsRunning() bool {
 	return lobby.game != nil
 }
 
+// Returns if all players are ready to start the game
+func (lobby *Lobby) IsReady() bool {
+	lobby.mutex.Lock()
+	defer lobby.mutex.Unlock()
+
+	for _, p := range lobby.players {
+		if !p.GetInfo().Ready {
+			return false
+		}
+	}
+	return true
+}
+
 func (lobby *Lobby) StartGame() {
 	lobby.mutex.Lock()
 	defer lobby.mutex.Unlock()
@@ -273,14 +303,14 @@ func (lobby *Lobby) StartGame() {
 	// Collect player token for game start event
 	players := []*Player{}
 	for _, v := range lobby.teams {
-		players = append(players, slices.Collect(maps.Values(v.GetPlayers()))...)
+		players = append(players, v.GetPlayers()...)
 	}
 	playerTokens := []string{}
 	for _, v := range players {
 		playerTokens = append(playerTokens, v.GetInfo().Token)
 	}
 
-	// Collect characters todo
+	// Collect characters
 	returnChars := map[string]map[string][]game.Character{}
 	for _, t := range lobby.GetTeams() {
 		for _, p := range t.GetPlayers() {

@@ -29,8 +29,10 @@ func readyLobby(c *fiber.Ctx) error {
 		return integration.InvalidRequest(c, "invalid request id")
 	}
 
+	player := lobby.GetPlayer(req.PlayerId)
+
 	// verify player token
-	if lobby.GetPlayerTokenById(req.PlayerId) != req.Token {
+	if player.GetInfo().Token != req.Token {
 		return integration.InvalidRequest(c, "bad token")
 	}
 
@@ -42,13 +44,18 @@ func readyLobby(c *fiber.Ctx) error {
 		return integration.InvalidRequest(c, "bad character selection")
 	}
 
-	//create game player
-	gp, err := lobby.SetGamePlayerById(req.PlayerId)
-	if err != nil {
-		return integration.InvalidRequest(c, "server error")
+	if lobby.IsRunning() {
+		return integration.InvalidRequest(c, "game is running")
 	}
 
-	// Check the validity of characters and safe the pointers
+	if player.GetInfo().Ready {
+		return integration.InvalidRequest(c, "player is ready")
+	}
+
+	//create game player
+	gp := player.SetGamePlayer()
+
+	// Check the validity of character ids and safe the pointers
 	ptrChars := []*game.Character{}
 	for _, char := range req.Characters {
 		createFunc, ok := game.CharacterRegistry[char]
@@ -60,33 +67,20 @@ func readyLobby(c *fiber.Ctx) error {
 	}
 
 	// Save chars
-	lobby.SetPlayerCharsById(req.PlayerId, ptrChars)
+	gp.SetCharacters(ptrChars)
 
-	if err := lobby.SetReadyPlayerById(req.PlayerId, true); err != nil {
-		return integration.InvalidRequest(c, "invalid player id")
-	}
+	// Ready player
+	player.SetReady(true)
 
-	if lobby.IsRunning() {
-		return integration.InvalidRequest(c, "game is running")
-	}
-
-	p1, err := lobby.GetPlayer(1)
-	if err != nil {
-		return integration.InvalidRequest(c, "server error")
-	}
-	p2, err := lobby.GetPlayer(2)
-	if err != nil {
-		return integration.InvalidRequest(c, "server error")
-	}
-
-	// Send lobby join event to players
+	// Send lobby change event to players
 	data, err := GetLobbyInfo(req.LobbyId)
 	if err != nil {
 		return integration.InvalidRequest(c, err.Error())
 	}
-	service.Instance.Send([]string{p1.Token, p2.Token}, LobbyChangeEvent(data))
+	service.Instance.Send(lobby.GetPlayersTokens(), LobbyChangeEvent(data))
 
-	if p1.Ready && p2.Ready {
+	// start game
+	if lobby.IsReady() {
 		lobby.StartGame()
 	}
 

@@ -9,8 +9,9 @@ import (
 )
 
 type LobbyJoinRequest struct {
-	LobbyId string `json:"lobby_id" validate:"required"`
-	Name    string `json:"name" validate:"required"`
+	LobbyId    string `json:"lobby_id" validate:"required"`
+	LobbyToken string `json:"lobby_token" validate:"required"`
+	Name       string `json:"name" validate:"required"`
 }
 
 // Route: /lobby/join
@@ -30,6 +31,11 @@ func joinLobby(c *fiber.Ctx) error {
 	lobby, ok := service.GetLobby(req.LobbyId)
 	if !ok {
 		return integration.InvalidRequest(c, "invalid id")
+	}
+
+	// verify lobby token
+	if lobby.GetInfo().Token != req.LobbyToken {
+		return integration.InvalidRequest(c, "bad token")
 	}
 
 	if lobby.IsFull() || lobby.IsRunning() {
@@ -62,14 +68,13 @@ func joinLobby(c *fiber.Ctx) error {
 		}
 	}
 
-	// TODO: add lobby info event
-
 	// Send lobby join event to host
 	data, err := GetLobbyInfo(req.LobbyId)
 	if err != nil {
 		return integration.InvalidRequest(c, err.Error())
 	}
-	service.Instance.SendOne(p1.Token, LobbyChangeEvent(data))
 
-	return c.JSON()
+	service.Instance.Send(lobby.GetPlayersTokens(), LobbyChangeEvent(data))
+
+	return c.JSON(res)
 }
