@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { Element, type Character } from '$lib/characters';
+	import { characters, Element, type Character } from '$lib/characters';
 	import PixelArtImage from '$lib/components/PixelArtImage.svelte';
+	import RetroButton from '$lib/components/RetroButton.svelte';
 	import CharacterRender from '../../game/characterRender.svelte';
 
 	const characterAmount = 4;
@@ -33,14 +34,42 @@
 	};
 </script>
 
-<div class="flex flex-col items-center justify-between w-screen h-screen p-2">
-	<div class="flex flex-col gap-2 items-center justify-center p-2">
-		<p class="text-bg-100 font-pixel">Your selection</p>
-		<div class="flex text-center gap-2 w-min">
-			{#each { length: characterAmount }}
-				<CharacterRender character={sampleCharacter} openAbilityMenu={() => {}} own={false} />
-			{/each}
+<div class="flex flex-col items-center justify-between w-screen h-screen p-2 gap-16">
+	<div class="flex gap-16">
+		<div class="flex flex-col gap-2 items-center justify-center p-2">
+			<p class="text-bg-100 font-pixel">Your selection</p>
+			<div class="flex text-center gap-2 w-min">
+				{#each { length: characterAmount }}
+					<CharacterRender
+						character={sampleCharacter}
+						healthBar={false}
+						openAbilityMenu={() => {}}
+						own={false}
+					/>
+				{/each}
+			</div>
+		</div>
+		<div class="flex flex-col gap-2 items-center justify-center p-2">
+			<p class="text-bg-100 font-pixel">[Mate]'s selection</p>
+			<div class="flex text-center gap-2 w-min">
+				{#each { length: characterAmount }}
+					<CharacterRender
+						character={sampleCharacter}
+						healthBar={false}
+						openAbilityMenu={() => {}}
+						own={false}
+					/>
+				{/each}
+			</div>
 		</div>
 	</div>
-	<div class="flex text-center p-4 gap-4 w-min"></div>
+	<div class="flex flex-wrap gap-2 max-w-10/12 justify-center items-center">
+		{#each Object.values(characters) as char}
+			<CharacterRender character={char} healthBar={false} openAbilityMenu={() => {}} own={false} />
+		{/each}
+	</div>
+	<div class="flex p-2 gap-4 mt-4 justify-center items-center w-full">
+		<RetroButton class="w-full max-w-sm" onClick={() => {}}>{'>> BACK <<'}</RetroButton>
+		<RetroButton class="w-full max-w-sm" onClick={() => {}}>{'>> READY <<'}</RetroButton>
+	</div>
 </div>

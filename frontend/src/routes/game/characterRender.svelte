@@ -6,10 +6,12 @@
 	let {
 		own,
 		character,
-		openAbilityMenu
+		openAbilityMenu,
+		healthBar = true
 	}: {
 		own: boolean;
 		character: Character;
+		healthBar?: boolean;
 		openAbilityMenu: (char: Character, own: boolean, position: { x: number; y: number }) => void;
 	} = $props();
 
@@ -29,7 +31,9 @@
 <div onclick={handleClick} class="relative cursor-pointer">
 	<PixelArtImage url="character-frame-empty.png" class="w-28 h-28" />
 	<PixelArtImage url={character.url} class="absolute top-0 left-0 w-28 h-28 pointer-events-none" />
-	<div class="absolute bottom-0 left-0 right-0 flex items-center justify-center">
-		<HealthIndicator health={character.health!} />
-	</div>
+	{#if healthBar}
+		<div class="absolute bottom-0 left-0 right-0 flex items-center justify-center">
+			<HealthIndicator health={character.health!} />
+		</div>
+	{/if}
 </div>
