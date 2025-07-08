@@ -1,4 +1,6 @@
 <script lang="ts">
+	import PixelArtImage from '$lib/components/PixelArtImage.svelte';
+
 	let { health }: { health: number } = $props();
 
 	let previousHealth = health;
@@ -20,13 +22,8 @@
 	});
 </script>
 
-<div class="flex items-center gap-1.5 bg-bg-700 border-2 border-bg-300 p-1 relative">
-	<img
-		src="heart.png"
-		alt="health"
-		class="w-4 aspect-auto"
-		style="image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;"
-	/>
+<div class="flex items-center gap-1 bg-bg-700 border-2 border-bg-300 p-1 relative">
+	<PixelArtImage url="heart.png" class="w-4 aspect-square" />
 	<span class="text-bg-100 font-pixel text-xs">{health < 0 ? 0 : health}</span>
 
 	{#if animatingDifference !== null}

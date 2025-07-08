@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Character } from '$lib/characters';
+	import PixelArtImage from '$lib/components/PixelArtImage.svelte';
 	import HealthIndicator from './healthIndicator.svelte';
 
 	let {
@@ -26,14 +27,8 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div onclick={handleClick} class="relative cursor-pointer">
-	<div
-		class="w-26 h-26 bg-center bg-no-repeat bg-contain"
-		style="background-image: url('character-frame-empty.png'); image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;"
-	></div>
-	<div
-		class="absolute top-0 left-0 w-26 h-26 bg-center bg-no-repeat bg-contain pointer-events-none"
-		style="background-image: url('{character.url}'); image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;"
-	></div>
+	<PixelArtImage url="character-frame-empty.png" class="w-28 h-28" />
+	<PixelArtImage url={character.url} class="absolute top-0 left-0 w-28 h-28 pointer-events-none" />
 	<div class="absolute bottom-0 left-0 right-0 flex items-center justify-center">
 		<HealthIndicator health={character.health!} />
 	</div>
