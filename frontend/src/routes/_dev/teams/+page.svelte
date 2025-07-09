@@ -2,8 +2,8 @@
 	import RetroButton from '$lib/components/RetroButton.svelte';
 </script>
 
-<div class="flex flex-col items-center justify-between w-screen h-screen p-2 gap-16">
-	<div class="flex items-center justify-center w-screen h-screen gap-8">
+<div class="flex flex-col items-center justify-between w-screen h-screen p-2 gap-2">
+	<div class="flex items-center justify-center w-full h-full gap-8">
 		<div
 			class="flex flex-col p-6 gap-4 border-6 border-double border-bg-200 bg-bg-700 w-full max-w-md"
 		>
@@ -20,7 +20,7 @@
 		</div>
 	</div>
 
-	<div class="flex p-2 gap-4 mt-4 justify-center items-center w-full">
+	<div class="flex p-2 gap-4 justify-center items-center w-full">
 		<RetroButton class="w-full max-w-sm" onClick={() => {}}>{'>> LEAVE TEAM <<'}</RetroButton>
 		<RetroButton class="w-full max-w-sm" onClick={() => {}}>{'>> READY <<'}</RetroButton>
 	</div>

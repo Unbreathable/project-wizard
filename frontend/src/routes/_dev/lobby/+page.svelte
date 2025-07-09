@@ -34,7 +34,7 @@
 	};
 </script>
 
-<div class="flex flex-col items-center justify-between w-screen h-screen p-2 gap-16">
+<div class="flex flex-col items-center justify-between w-screen h-screen p-2 pt-3 gap-16">
 	<div class="flex gap-16">
 		<div class="flex flex-col gap-2 items-center justify-center p-2">
 			<p class="text-bg-100 font-pixel">Your selection</p>

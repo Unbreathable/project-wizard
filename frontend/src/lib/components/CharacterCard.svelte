@@ -1,13 +1,21 @@
 <script lang="ts">
-	import { type Character } from '$lib/characters';
+	import { type Action, type Character } from '$lib/characters';
 	import ActionDescription from './ActionDescription.svelte';
 	import ElementChip from './ElementChip.svelte';
 
-	let { character }: { character: Character } = $props();
+	let {
+		character,
+		actionsClickable,
+		onAction
+	}: {
+		character: Character;
+		actionsClickable?: boolean;
+		onAction?: (action: Action) => void;
+	} = $props();
 </script>
 
 <div class="bg-bg-800 border-2 border-bg-300 p-4 max-w-sm">
-	<div class="mb-3">
+	<div class="mb-3 text-left">
 		<div class="flex justify-between">
 			<h3 class="font-pixel text-bg-100 text-lg mb-1">
 				{character.name || `Character ${character.id}`}
@@ -31,8 +39,20 @@
 	{#if character.actions}
 		<div class="flex flex-col mt-2 gap-2 space-y-2">
 			{#each Object.values(character.actions) as action}
-				<ActionDescription {action} />
+				<ActionDescription
+					clickable={actionsClickable}
+					onClick={() => {
+						if (onAction != null) {
+							onAction(action);
+						}
+					}}
+					{action}
+				/>
 			{/each}
 		</div>
 	{/if}
+
+	<!-- For selection swap target 
+	<RetroButton class="mt-4" onClick={() => {}}>{'>> SWAP <<'}</RetroButton>
+	-->
 </div>

@@ -44,5 +44,8 @@
 			"@tailwindcss/oxide",
 			"esbuild"
 		]
+	},
+	"dependencies": {
+		"bits-ui": "^2.8.10"
 	}
 }

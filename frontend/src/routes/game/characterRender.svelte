@@ -1,39 +1,65 @@
 <script lang="ts">
-	import type { Character } from '$lib/characters';
+	import type { Action, Character } from '$lib/characters';
+	import CharacterCard from '$lib/components/CharacterCard.svelte';
 	import PixelArtImage from '$lib/components/PixelArtImage.svelte';
 	import HealthIndicator from './healthIndicator.svelte';
+	import { LinkPreview } from 'bits-ui';
 
 	let {
-		own,
 		character,
-		openAbilityMenu,
-		healthBar = true
+		onClick,
+		onAction,
+		healthBar = true,
+		actionsClickable = false
 	}: {
-		own: boolean;
 		character: Character;
+		onClick?: () => void;
+		onAction?: (action: Action) => void;
 		healthBar?: boolean;
-		openAbilityMenu: (char: Character, own: boolean, position: { x: number; y: number }) => void;
+		actionsClickable?: boolean;
 	} = $props();
 
-	function handleClick(event: MouseEvent) {
-		event.stopPropagation(); // Prevent the parent's closeActionMenu from being called
-		const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-		const position = {
-			x: rect.left + rect.width / 2,
-			y: rect.top + rect.height / 2
-		};
-		openAbilityMenu(character, own, position);
+	let previewOpen = $state(false);
+	let changingBlocked = false;
+
+	function changed(newOpen: boolean) {
+		if (!newOpen) {
+			changingBlocked = true;
+			setTimeout(() => (changingBlocked = false), 500);
+		}
+	}
+
+	function handleClick() {
+		if (changingBlocked) {
+			return;
+		}
+		previewOpen = !previewOpen;
 	}
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div onclick={handleClick} class="relative cursor-pointer">
-	<PixelArtImage url="character-frame-empty.png" class="w-28 h-28" />
-	<PixelArtImage url={character.url} class="absolute top-0 left-0 w-28 h-28 pointer-events-none" />
-	{#if healthBar}
-		<div class="absolute bottom-0 left-0 right-0 flex items-center justify-center">
-			<HealthIndicator health={character.health!} />
+<LinkPreview.Root
+	bind:open={previewOpen}
+	openDelay={999999999}
+	onOpenChange={changed}
+	closeDelay={0}
+>
+	<LinkPreview.Trigger class="cursor-pointer">
+		<div onclick={handleClick} class="relative cursor-pointer">
+			<PixelArtImage url="character-frame-empty.png" class="w-28 h-28" />
+			<PixelArtImage
+				url={character.url}
+				class="absolute top-0 left-0 w-28 h-28 pointer-events-none"
+			/>
+			{#if healthBar}
+				<div class="absolute bottom-0 left-0 right-0 flex items-center justify-center">
+					<HealthIndicator health={character.health!} />
+				</div>
+			{/if}
 		</div>
-	{/if}
-</div>
+	</LinkPreview.Trigger>
+	<LinkPreview.Content class="bg-bg-800 border-2 border-bg-300 z-50" sideOffset={0} side="bottom">
+		<CharacterCard {actionsClickable} {onAction} {character} />
+	</LinkPreview.Content>
+</LinkPreview.Root>
