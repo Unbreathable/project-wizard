@@ -11,20 +11,9 @@ import (
 
 const CharacterAmount = 4
 
-type LobbyMode string
-
-// All the elements
-const (
-	LobbyMode1vs1 LobbyMode = "1vs1"
-)
-
-var LobbyModes = []LobbyMode{
-	LobbyMode1vs1,
-}
-
 type Lobby struct {
 	mutex           *sync.Mutex
-	mode            LobbyMode          // lobby mode
+	gameState       GameState
 	id              string             // lobby id for interactions
 	token           string             // lobby token for join requests
 	playerIds       []string           // needed to generate unique ids
@@ -36,15 +25,15 @@ type Lobby struct {
 }
 
 type LobbyInfo struct {
-	Id    string    `json:"id"`
-	Mode  LobbyMode `json:"mode"`
-	Token string    `json:"-"`
+	Id        string    `json:"id"`
+	GameState GameState `json:"state"`
+	Token     string    `json:"-"`
 }
 
 var lobbies sync.Map
 
 // Creates a new lobby and returns the id
-func CreateLobby(mode LobbyMode) (lobbyId string) {
+func CreateLobby() (lobbyId string) {
 
 	// Create unique lobby id
 	lobbyId = uuid.New().String()
@@ -57,11 +46,11 @@ func CreateLobby(mode LobbyMode) (lobbyId string) {
 
 	// Store lobby
 	lobbies.Store(lobbyId, &Lobby{
-		mutex: &sync.Mutex{},
-		id:    lobbyId,
-		mode:  mode,
-		game:  nil,
-		token: uuid.New().String(),
+		mutex:     &sync.Mutex{},
+		id:        lobbyId,
+		gameState: GameStateTeamSelect,
+		game:      nil,
+		token:     uuid.New().String(),
 	})
 	return lobbyId
 }
@@ -78,6 +67,14 @@ func GetLobby(lobbyId string) (*Lobby, bool) {
 		return &Lobby{}, false
 	}
 	return value.(*Lobby), true
+}
+
+// Sets the gamestate of the lobby
+func (lobby *Lobby) SetGameState(gs GameState) {
+	lobby.mutex.Lock()
+	defer lobby.mutex.Unlock()
+
+	lobby.gameState = gs
 }
 
 // Returns pointer to game
@@ -215,9 +212,9 @@ func (lobby *Lobby) GetInfo() LobbyInfo {
 	defer lobby.mutex.Unlock()
 
 	return LobbyInfo{
-		Id:    lobby.id,
-		Mode:  lobby.mode,
-		Token: lobby.token,
+		Id:        lobby.id,
+		GameState: lobby.gameState,
+		Token:     lobby.token,
 	}
 }
 

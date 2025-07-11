@@ -45,26 +45,23 @@ func joinLobby(c *fiber.Ctx) error {
 	res := LobbyCreateResponse{
 		Success:  true,
 		LobbyId:  lobby.GetInfo().Id,
-		Mode:     lobby.GetInfo().Mode,
 		TeamId:   "",
 		PlayerId: "",
 		Token:    "",
 	}
 
-	switch lobby.GetInfo().Mode {
-	case service.LobbyMode1vs1:
-		for _, v := range lobby.GetTeams() {
-			if !v.IsFull() {
-				p := lobby.NewPlayer(req.Name)
-				v.AddPlayer(p) // error can be ignored because team is not full
+	//TODO:change
+	for _, v := range lobby.GetTeams() {
+		if !v.IsFull() {
+			p := lobby.NewPlayer(req.Name)
+			v.AddPlayer(p) // error can be ignored because team is not full
 
-				info := p.GetInfo()
+			info := p.GetInfo()
 
-				res.TeamId = v.GetId()
-				res.PlayerId = info.Id
-				res.Token = info.Token
-				break
-			}
+			res.TeamId = v.GetId()
+			res.PlayerId = info.Id
+			res.Token = info.Token
+			break
 		}
 	}
 

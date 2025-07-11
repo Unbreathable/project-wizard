@@ -1,11 +1,15 @@
 package service
 
-type GameState = string
+type GameState uint
 
 const (
-	GameStateTeamSelect      GameState = "team_select"
-	GameStateCharacterSelect GameState = "char_select"
-	GameStateRunning         GameState = "running"
-	GameStateSimulating      GameState = "simulating"
-	GameStateEnd             GameState = "end"
+	GameStateTeamSelect      GameState = 0
+	GameStateCharacterSelect GameState = 1
+	GameStateRunning         GameState = 2
+	GameStateSimulating      GameState = 3
+	GameStateEnd             GameState = 4
 )
+
+func (g GameState) GetPtr() *GameState {
+	return &g
+}

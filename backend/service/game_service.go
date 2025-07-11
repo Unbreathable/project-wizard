@@ -130,48 +130,46 @@ func (g *Game) StartTurn() error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 
-	switch g.relatedLobby.GetInfo().Mode {
-	case LobbyMode1vs1:
-		teams := g.relatedLobby.GetTeams()
-		if len(teams) != 2 {
-			return fmt.Errorf("bad teams")
-		}
-
-		var p1 *Player
-		var p2 *Player
-
-		t1 := teams[0]
-		t2 := teams[1]
-
-		if len(t1.GetPlayers()) != 1 || len(t2.GetPlayers()) != 1 {
-			return fmt.Errorf("bad players")
-		}
-
-		p1 = t1.GetPlayers()[0]
-		p2 = t2.GetPlayers()[0]
-
-		err := game.RunSimulation([]*game.GamePlayer{p1.GetGamePlayer(), p2.GetGamePlayer()}, g.playerActions, g.playerSwaps)
-		if err != nil {
-			return err
-		}
-
-		// Send result of turn to clients
-		Instance.Send(g.relatedLobby.GetSpectator(), GameUpdateEvent(SimulationResultEvent{
-			Swaps:   g.playerSwaps,
-			Actions: g.playerActions,
-			Result: map[string]SimulationResult{
-				p1.GetInfo().Id: {
-					Mana:       p1.GetGamePlayer().Mana,
-					ID:         p1.GetInfo().Id,
-					Characters: p1.GetGamePlayer().GetCharacters(),
-				},
-				p2.GetInfo().Id: {
-					Mana:       p2.GetGamePlayer().Mana,
-					ID:         p2.GetInfo().Id,
-					Characters: p2.GetGamePlayer().GetCharacters(),
-				},
-			},
-		}))
+	//TODO: change
+	teams := g.relatedLobby.GetTeams()
+	if len(teams) != 2 {
+		return fmt.Errorf("bad teams")
 	}
+
+	var p1 *Player
+	var p2 *Player
+
+	t1 := teams[0]
+	t2 := teams[1]
+
+	if len(t1.GetPlayers()) != 1 || len(t2.GetPlayers()) != 1 {
+		return fmt.Errorf("bad players")
+	}
+
+	p1 = t1.GetPlayers()[0]
+	p2 = t2.GetPlayers()[0]
+
+	err := game.RunSimulation([]*game.GamePlayer{p1.GetGamePlayer(), p2.GetGamePlayer()}, g.playerActions, g.playerSwaps)
+	if err != nil {
+		return err
+	}
+
+	// Send result of turn to clients
+	Instance.Send(g.relatedLobby.GetSpectator(), GameUpdateEvent(SimulationResultEvent{
+		Swaps:   g.playerSwaps,
+		Actions: g.playerActions,
+		Result: map[string]SimulationResult{
+			p1.GetInfo().Id: {
+				Mana:       p1.GetGamePlayer().Mana,
+				ID:         p1.GetInfo().Id,
+				Characters: p1.GetGamePlayer().GetCharacters(),
+			},
+			p2.GetInfo().Id: {
+				Mana:       p2.GetGamePlayer().Mana,
+				ID:         p2.GetInfo().Id,
+				Characters: p2.GetGamePlayer().GetCharacters(),
+			},
+		},
+	}))
 	return nil
 }
