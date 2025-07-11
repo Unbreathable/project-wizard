@@ -11,7 +11,7 @@
 		end: Point;
 		endDirection: Direction;
 	}
-	6;
+
 	enum Direction {
 		Up,
 		Down,
@@ -42,7 +42,7 @@
 				start: firstPoint,
 				startDirection: Direction.Up,
 				end: { x, y },
-				endDirection: Direction.Down
+				endDirection: Direction.Up
 			};
 			arrows.push(newArrow);
 			firstPoint = null;
@@ -65,64 +65,85 @@
 
 		let segmentLength = 0;
 		if (Math.abs(dx) > Math.abs(dy)) {
-			segmentLength = dx / 4;
+			segmentLength = Math.abs(dx / 4);
 		} else {
-			segmentLength = dy / 4;
+			segmentLength = Math.abs(dy / 4);
 		}
 
 		const startExtended = movePoint(start, startDirection, segmentLength);
 		const endExtended = movePoint(end, endDirection, segmentLength);
 
-		// Calculate arrow head points
-		const headSize = segmentLength / 3;
-		let headPoints: Point[] = [];
+		const arrowheadSize = 20;
+		const oppositeDirection = getOppositeDirection(endDirection);
+		const arrowheadPosition = movePoint(end, oppositeDirection, arrowheadSize - 8);
+		const arrowhead = calculateArrowhead(arrowheadPosition, endDirection, arrowheadSize);
 
-		switch (endDirection) {
-			case Direction.Down:
-				headPoints = [
-					{ x: end.x - headSize / 2, y: end.y + headSize },
-					{ x: end.x + headSize / 2, y: end.y + headSize }
-				];
+		return {
+			line: `M ${start.x} ${start.y} L ${startExtended.x} ${startExtended.y} L ${endExtended.x} ${endExtended.y} L ${end.x} ${end.y}`,
+			arrowhead: `M ${arrowheadPosition.x} ${arrowheadPosition.y} L ${arrowhead.left.x} ${arrowhead.left.y} L ${arrowhead.right.x} ${arrowhead.right.y} Z`
+		};
+	}
+
+	function calculateArrowhead(point: Point, direction: Direction, size: number) {
+		// Since directions are inverse, we need to calculate the arrowhead
+		// pointing in the opposite direction of the endDirection
+		let angle: number;
+		switch (direction) {
+			case Direction.Up: // Arrow coming from below, pointing up
+				angle = -Math.PI / 2; // Point upward
 				break;
-			case Direction.Up:
-				headPoints = [
-					{ x: end.x - headSize / 2, y: end.y - headSize },
-					{ x: end.x + headSize / 2, y: end.y - headSize }
-				];
+			case Direction.Down: // Arrow coming from above, pointing down
+				angle = Math.PI / 2; // Point downward
 				break;
-			case Direction.Left:
-				headPoints = [
-					{ x: end.x + headSize, y: end.y - headSize / 2 },
-					{ x: end.x + headSize, y: end.y + headSize / 2 }
-				];
+			case Direction.Left: // Arrow coming from right, pointing left
+				angle = Math.PI; // Point left
 				break;
-			case Direction.Right:
-				headPoints = [
-					{ x: end.x - headSize, y: end.y - headSize / 2 },
-					{ x: end.x - headSize, y: end.y + headSize / 2 }
-				];
+			case Direction.Right: // Arrow coming from left, pointing right
+				angle = 0; // Point right
 				break;
 		}
 
-		// Create integrated path with arrow head
-		const linePath = `M ${start.x} ${start.y} L ${startExtended.x} ${startExtended.y} L ${endExtended.x} ${endExtended.y} L ${end.x} ${end.y}`;
-		const arrowHeadPath = `M ${headPoints[0].x} ${headPoints[0].y} L ${end.x} ${end.y} L ${headPoints[1].x} ${headPoints[1].y}`;
+		// Rotate by 180 degrees
+		angle += Math.PI;
+
+		const leftAngle = angle + Math.PI * 0.75;
+		const rightAngle = angle - Math.PI * 0.75;
 
 		return {
-			line: `${linePath} ${arrowHeadPath}`
+			left: {
+				x: point.x + Math.cos(leftAngle) * size,
+				y: point.y + Math.sin(leftAngle) * size
+			},
+			right: {
+				x: point.x + Math.cos(rightAngle) * size,
+				y: point.y + Math.sin(rightAngle) * size
+			}
 		};
+	}
+
+	function getOppositeDirection(direction: Direction): Direction {
+		switch (direction) {
+			case Direction.Up:
+				return Direction.Down;
+			case Direction.Down:
+				return Direction.Up;
+			case Direction.Left:
+				return Direction.Right;
+			case Direction.Right:
+				return Direction.Left;
+		}
 	}
 
 	function movePoint(point: Point, direction: Direction, amount: number): Point {
 		switch (direction) {
 			case Direction.Up:
-				return { x: point.x, y: point.y + amount };
-			case Direction.Down:
 				return { x: point.x, y: point.y - amount };
+			case Direction.Down:
+				return { x: point.x, y: point.y + amount };
 			case Direction.Left:
-				return { x: point.x - amount, y: point.y };
-			case Direction.Right:
 				return { x: point.x + amount, y: point.y };
+			case Direction.Right:
+				return { x: point.x - amount, y: point.y };
 		}
 	}
 </script>
@@ -139,8 +160,10 @@
 				arrow.endDirection
 			)}
 			<g onclick={(e) => handleArrowClick(arrow, e)}>
-				<path d={path.line} class="arrow-body" />
+				<path d={path.arrowhead} class="arrowhead-outline" />
 				<path d={path.line} class="arrow-outline" />
+				<path d={path.line} class="arrow-body" />
+				<path d={path.arrowhead} class="arrowhead-body" />
 			</g>
 		{/each}
 	</svg>
@@ -148,14 +171,29 @@
 
 <style>
 	.arrow-body {
-		stroke: white;
-		stroke-width: 20;
+		stroke: var(--color-bg-300);
+		stroke-width: 8;
 		fill: none;
+		stroke-linecap: square;
 	}
 
 	.arrow-outline {
-		stroke: red;
-		stroke-width: 10;
+		stroke: var(--color-bg-400);
+		stroke-width: 16;
 		fill: none;
+		stroke-linecap: square;
+	}
+
+	.arrowhead-body {
+		fill: var(--color-bg-300);
+		stroke: none;
+	}
+
+	.arrowhead-outline {
+		fill: var(--color-bg-400);
+		stroke: var(--color-bg-400);
+		stroke-width: 8;
+		stroke-linecap: butt;
+		stroke-linejoin: miter;
 	}
 </style>

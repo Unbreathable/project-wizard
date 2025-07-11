@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Action, Character } from '$lib/characters';
+	import type { Arrow } from '$lib/components/arrows/arrows';
 	import CharacterCard from '$lib/components/CharacterCard.svelte';
 	import PixelArtImage from '$lib/components/PixelArtImage.svelte';
 	import HealthIndicator from './healthIndicator.svelte';
@@ -13,7 +14,7 @@
 		actionsClickable = false
 	}: {
 		character: Character;
-		onClick?: () => void;
+		onClick?: (e: MouseEvent) => void;
 		onAction?: (action: Action) => void;
 		healthBar?: boolean;
 		actionsClickable?: boolean;
@@ -29,7 +30,11 @@
 		}
 	}
 
-	function handleClick() {
+	function handleClick(e: MouseEvent) {
+		if (onClick != null) {
+			onClick(e);
+			return;
+		}
 		if (changingBlocked) {
 			return;
 		}

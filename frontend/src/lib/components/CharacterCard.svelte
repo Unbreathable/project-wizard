@@ -2,6 +2,7 @@
 	import { type Action, type Character } from '$lib/characters';
 	import ActionDescription from './ActionDescription.svelte';
 	import ElementChip from './ElementChip.svelte';
+	import RetroButton from './RetroButton.svelte';
 
 	let {
 		character,
@@ -14,7 +15,7 @@
 	} = $props();
 </script>
 
-<div class="bg-bg-800 border-2 border-bg-300 p-4 max-w-sm">
+<div class="bg-bg-800 border-2 border-bg-300 border-dotted p-4 max-w-sm">
 	<div class="mb-3 text-left">
 		<div class="flex justify-between">
 			<h3 class="font-pixel text-bg-100 text-lg mb-1">
@@ -52,7 +53,5 @@
 		</div>
 	{/if}
 
-	<!-- For selection swap target 
 	<RetroButton class="mt-4" onClick={() => {}}>{'>> SWAP <<'}</RetroButton>
-	-->
 </div>
