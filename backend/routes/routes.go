@@ -32,8 +32,22 @@ func SetupRoutes(router fiber.Router) {
 	router.Route("/info", info_routes.InfoRoutes)
 }
 
+func validatedNeoHandler[T struct{}](handler func(*neogate.Context, T) neogate.Event) func(*neogate.Context, T) neogate.Event {
+	return func(c *neogate.Context, content T) neogate.Event {
+		if err := service.Validate.Struct(content); err != nil {
+			return neogate.ErrorResponse(c, "invalid request", err)
+		}
+
+		return handler(c, content)
+	}
+}
+
 // Setup neogate
 func setupNeo(router fiber.Router) {
+
+	neogate.CreateHandlerFor(service.Instance, "lobby_create", func(c *neogate.Context, _ interface{}) neogate.Event {
+		return neogate.ErrorResponse(c, "server error", nil)
+	})
 
 	// Create the gateway
 	service.Instance = neogate.Setup(neogate.Config{
