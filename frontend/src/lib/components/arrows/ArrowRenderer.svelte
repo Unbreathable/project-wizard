@@ -43,8 +43,8 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 {#key windowHeight + windowWidth}
-	<div class="absolute inset-0 z-20 w-screen h-screen pointer-events-none">
-		<svg width="100%" height="100%">
+	<div class="absolute inset-0 z-20 w-full h-full pointer-events-none">
+		<svg class="block w-full h-full">
 			{#each { length: 1 }}
 				{@const map = preProcessArrows(arrows)}
 				{#each map.entries() as [_, arrowGroup], groupIndex}

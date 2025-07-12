@@ -2,7 +2,7 @@
 	import { Element, getRandomElement, type Character } from '$lib/characters';
 	import ArrowRenderer from '$lib/components/arrows/ArrowRenderer.svelte';
 	import { Direction, getArrowColor, type Arrow } from '$lib/components/arrows/arrows';
-	import CharacterRender from '../../game/characterRender.svelte';
+	import CharacterRendererVertical from '$lib/components/CharacterRendererVertical.svelte';
 
 	const characterAmount = 4;
 
@@ -46,7 +46,7 @@
 	let startId: string | null = null;
 	let bottomElement: HTMLElement | null = null;
 
-	function handleClickBottom(e: MouseEvent, player: number, slot: number) {
+	function handleClickLeft(e: MouseEvent, player: number, slot: number) {
 		if (!(e.currentTarget instanceof HTMLElement)) {
 			console.error('no html element wtf');
 			return;
@@ -55,9 +55,9 @@
 			arrows.push({
 				start: bottomElement,
 				startId: startId!,
-				startDirection: Direction.Up,
+				startDirection: Direction.Left,
 				end: e.currentTarget as HTMLElement,
-				endDirection: Direction.Up,
+				endDirection: Direction.Left,
 				colors: getArrowColor(Element.Earth, false, true)
 			});
 			console.log('arrow!!!');
@@ -68,7 +68,7 @@
 		bottomElement = e.currentTarget as HTMLElement;
 	}
 
-	function handleClickTop(e: MouseEvent, player: number, slot: number) {
+	function handleClickRight(e: MouseEvent, player: number, slot: number) {
 		if (!(e.currentTarget instanceof HTMLElement)) {
 			console.error('no html element wtf');
 			return;
@@ -77,9 +77,9 @@
 			arrows.push({
 				start: bottomElement,
 				startId: startId!,
-				startDirection: Direction.Up,
+				startDirection: Direction.Left,
 				end: e.currentTarget as HTMLElement,
-				endDirection: Direction.Down,
+				endDirection: Direction.Right,
 				colors: getArrowColor(getRandomElement(), false, true)
 			});
 			console.log('arrow!!!');
@@ -88,57 +88,78 @@
 	}
 </script>
 
-<div class="relative flex flex-col items-center justify-between w-screen h-screen p-2 py-3 gap-16">
-	<div class="flex gap-16">
-		<div class="flex flex-col gap-2 items-center justify-center p-2 relative">
-			<p class="text-bg-100 font-pixel">[Enemy Name]</p>
-			<div class="flex gap-2 w-min">
+<div class="relative flex items-center justify-between w-screen min-h-screen h-full p-2 gap-16">
+	<div class="flex flex-col gap-8">
+		<div class="flex gap-4 items-center justify-center p-2">
+			<p
+				class="text-bg-100 font-pixel rotate-180"
+				style="text-orientation: sideways; writing-mode: vertical-rl;"
+			>
+				[Your Name]
+			</p>
+			<div class="flex flex-col text-center gap-2">
 				{#each { length: characterAmount } as _, index}
-					<CharacterRender
+					<CharacterRendererVertical
 						character={sampleCharacter}
-						onClick={(e) => handleClickTop(e, 1, index)}
+						onClick={(e) => handleClickLeft(e, 3, index)}
 						healthBar={true}
 					/>
 				{/each}
 			</div>
 		</div>
-		<div class="flex flex-col gap-2 items-center justify-center p-2">
-			<p class="text-bg-100 font-pixel">[Enemy Name]</p>
-			<div class="flex text-center gap-2 w-min">
+		<div class="flex gap-4 items-center justify-center p-2">
+			<p
+				class="text-bg-100 font-pixel rotate-180"
+				style="text-orientation: sideways; writing-mode: vertical-rl;"
+			>
+				[Mate Name]
+			</p>
+			<div class="flex flex-col text-center gap-2">
 				{#each { length: characterAmount } as _, index}
-					<CharacterRender
+					<CharacterRendererVertical
 						character={sampleCharacter}
-						onClick={(e) => handleClickTop(e, 2, index)}
+						onClick={(e) => handleClickLeft(e, 4, index)}
 						healthBar={true}
 					/>
 				{/each}
 			</div>
 		</div>
 	</div>
-	<div class="flex gap-16">
-		<div class="flex flex-col gap-2 items-center justify-center p-2">
-			<div class="flex text-center gap-2 w-min">
+
+	<div class="flex flex-col gap-16">
+		<div class="flex gap-4 items-center justify-center p-2 relative">
+			<div class="flex flex-col gap-2">
 				{#each { length: characterAmount } as _, index}
-					<CharacterRender
+					<CharacterRendererVertical
 						character={sampleCharacter}
-						onClick={(e) => handleClickBottom(e, 3, index)}
+						onClick={(e) => handleClickRight(e, 1, index)}
 						healthBar={true}
 					/>
 				{/each}
 			</div>
-			<p class="text-bg-100 font-pixel">[Your Name]</p>
+			<p
+				class="text-bg-100 font-pixel"
+				style="text-orientation: sideways; writing-mode: vertical-rl;"
+			>
+				[Enemy Name]
+			</p>
 		</div>
-		<div class="flex flex-col gap-2 items-center justify-center p-2">
-			<div class="flex text-center gap-2 w-min">
+		<div class="flex gap-4 items-center justify-center p-2">
+			<div class="flex flex-col text-center gap-2">
 				{#each { length: characterAmount } as _, index}
-					<CharacterRender
+					<CharacterRendererVertical
 						character={sampleCharacter}
-						onClick={(e) => handleClickBottom(e, 4, index)}
+						onClick={(e) => handleClickRight(e, 2, index)}
 						healthBar={true}
 					/>
 				{/each}
 			</div>
-			<p class="text-bg-100 font-pixel">[Mate Name]</p>
+			<p
+				class="text-bg-100 font-pixel"
+				style="text-orientation: sideways; writing-mode: vertical-rl;"
+			>
+				[Enemy Name]
+			</p>
 		</div>
 	</div>
 

@@ -26,12 +26,19 @@ export interface Point {
     y: number;
 }
 
+export interface Rect {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+
 /**
  * Calculate the path for an arrow.
  */
 export function calculateArrowPath(arrow: Arrow, index: number, arrows: number): ArrowPath {
     const gap = 8; // How much of a gap to leave from the html elements
-    const arrowPadding = 16; // How big the arrow is to make sure we're pointing exactly to start and end
+    const arrowPadding = 18; // How big the arrow is to make sure we're pointing exactly to start and end
     const arrowWidth = 16;
 
     let totalLength = (arrowWidth + gap) * arrows - gap;
@@ -49,9 +56,9 @@ export function calculateArrowPath(arrow: Arrow, index: number, arrows: number):
 
     let segmentLength = 0;
     if (Math.abs(dx) > Math.abs(dy)) {
-        segmentLength = Math.abs(dx / 4);
+        segmentLength = Math.abs(dx / 3);
     } else {
-        segmentLength = Math.abs(dy / 4);
+        segmentLength = Math.abs(dy / 3);
     }
 
     const startExtended = movePoint(start, arrow.startDirection, segmentLength);
@@ -70,7 +77,7 @@ export function calculateArrowPath(arrow: Arrow, index: number, arrows: number):
     };
 }
 
-export function getCenterAroundRect(rect: DOMRect, direction: Direction, offset: number): Point {
+export function getCenterAroundRect(rect: Rect, direction: Direction, offset: number): Point {
     switch(direction) {
         case Direction.Up:
             return {
@@ -84,12 +91,12 @@ export function getCenterAroundRect(rect: DOMRect, direction: Direction, offset:
             };
         case Direction.Left:
             return  {
-                x: rect.x,
+                x: rect.x + rect.width,
                 y: rect.y + rect.height / 2 + offset,
             }
         case Direction.Right:
             return {
-                x: rect.x + rect.width,
+                x: rect.x,
                 y: rect.y + rect.height / 2 + offset,
             };
     }
@@ -106,10 +113,10 @@ export function calculateArrowHead(point: Point, direction: Direction, size: num
             angle = Math.PI + Math.PI / 2;
             break;
         case Direction.Left: // Arrow coming from right, pointing left
-            angle = 2 * Math.PI;
+            angle = Math.PI;
             break;
         case Direction.Right: // Arrow coming from left, pointing right
-            angle = Math.PI;
+            angle = 2 * Math.PI;
             break;
     }
 
