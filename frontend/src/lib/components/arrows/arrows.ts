@@ -1,3 +1,5 @@
+import { Element } from "$lib/characters";
+
 export enum Direction {
     Up,
     Down,
@@ -11,6 +13,7 @@ export interface Arrow {
     startDirection: Direction;
     end: HTMLElement;
     endDirection: Direction;
+    colors?: ArrowColors;
 }
 
 export interface ArrowPath {
@@ -149,4 +152,67 @@ export function movePoint(point: Point, direction: Direction, amount: number): P
         case Direction.Right:
             return { x: point.x - amount, y: point.y };
     }
+}
+
+export interface ArrowColors {
+    bodyColor: string;
+    outlineColor: string;
+}
+
+export function getArrowColorOrDefault(arrow: Arrow): ArrowColors {
+    return arrow.colors ?? defaultArrowColors();
+}
+
+export function getArrowColor(element: Element, swap: boolean, oversight: boolean): ArrowColors {
+    if(element != Element.None) {
+        switch(element) {
+            case Element.Fire:
+                return {
+                    bodyColor: "var(--color-p-red-400)",
+                    outlineColor: "var(--color-p-red-200)",
+                };
+            case Element.Water:
+                return {
+                    bodyColor: "var(--color-p-blue-400)",
+                    outlineColor: "var(--color-p-blue-200)",
+                };
+            case Element.Earth:
+                return {
+                    bodyColor: "var(--color-p-brown-400)",
+                    outlineColor: "var(--color-p-brown-200)",
+                };
+            case Element.Air:
+                return defaultArrowColors();
+            case Element.Dark:
+                return {
+                    bodyColor: "var(--color-p-purple-400)",
+                    outlineColor: "var(--color-p-purple-200)",
+                };
+            case Element.Light:
+                return {
+                    bodyColor: "var(--color-p-orange-500)",
+                    outlineColor: "var(--color-p-orange-300)",
+                };
+        }
+    }
+
+    if(oversight) {
+        return {
+            bodyColor: "var(--color-p-orange-500)",
+            outlineColor: "var(--color-p-orange-300)",
+        };
+    }
+
+    if(swap) {
+        return defaultArrowColors();
+    }
+    
+    return defaultArrowColors(); 
+}
+
+export function defaultArrowColors(): ArrowColors {
+    return {
+        bodyColor: "var(--color-bg-400)",
+        outlineColor: "var(--color-bg-200)",
+    };
 }

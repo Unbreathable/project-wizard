@@ -42,6 +42,12 @@
   --color-p-orange-300: #ed7614;
   --color-p-orange-200: #ffa214;
   --color-p-orange-100: #ffc825;
+
+  --color-p-brown-500: #57231c; /* Not in the original */
+  --color-p-brown-400: #89301e; /* Not in the original */
+  --color-p-brown-300: #8a4836;
+  --color-p-brown-200: #bf6f4a;
+  --color-p-brown-100: #e69c69;
   
   --font-pixel: 'Pixel', sans-serif;
 }

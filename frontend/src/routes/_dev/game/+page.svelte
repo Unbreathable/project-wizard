@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { Element, type Character } from '$lib/characters';
+	import { Element, getRandomElement, type Character } from '$lib/characters';
 	import ArrowRenderer from '$lib/components/arrows/ArrowRenderer.svelte';
-	import { Direction, type Arrow } from '$lib/components/arrows/arrows';
+	import { Direction, getArrowColor, type Arrow } from '$lib/components/arrows/arrows';
 	import CharacterRender from '../../game/characterRender.svelte';
 
 	const characterAmount = 4;
@@ -57,7 +57,8 @@
 				startId: startId!,
 				startDirection: Direction.Up,
 				end: e.currentTarget as HTMLElement,
-				endDirection: Direction.Up
+				endDirection: Direction.Up,
+				colors: getArrowColor(Element.Earth, false, true)
 			});
 			console.log('arrow!!!');
 			bottomElement = null;
@@ -78,7 +79,8 @@
 				startId: startId!,
 				startDirection: Direction.Up,
 				end: e.currentTarget as HTMLElement,
-				endDirection: Direction.Down
+				endDirection: Direction.Down,
+				colors: getArrowColor(getRandomElement(), false, true)
 			});
 			console.log('arrow!!!');
 			bottomElement = null;

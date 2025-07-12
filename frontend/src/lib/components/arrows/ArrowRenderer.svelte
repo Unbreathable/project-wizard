@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { calculateArrowPath, type Arrow } from './arrows';
+	import SingleArrow from './SingleArrow.svelte';
+	import { calculateArrowPath, getArrowColorOrDefault, type Arrow } from './arrows';
 	import { onMount } from 'svelte';
 
 	let {
@@ -12,24 +13,14 @@
 	let windowHeight = $state(0);
 
 	onMount(() => {
-		// Set initial values
+		window.addEventListener('resize', handleResize);
+		return () => window.removeEventListener('resize', handleResize);
+	});
+
+	function handleResize() {
 		windowWidth = window.innerWidth;
 		windowHeight = window.innerHeight;
-
-		// Listen for resize events
-		function handleResize() {
-			windowWidth = window.innerWidth;
-			windowHeight = window.innerHeight;
-			console.log('resize');
-		}
-
-		window.addEventListener('resize', handleResize);
-
-		// Cleanup
-		return () => {
-			window.removeEventListener('resize', handleResize);
-		};
-	});
+	}
 
 	function handleArrowClick(index: number, e: MouseEvent) {
 		console.log('arrow clicked!', index);
@@ -59,47 +50,16 @@
 				{#each map.entries() as [_, arrowGroup], groupIndex}
 					{#each arrowGroup as arrow, arrowIndex}
 						{@const path = calculateArrowPath(arrow, arrowIndex, arrowGroup.length)}
-						<g
-							onclick={(e) => handleArrowClick(groupIndex * 100 + arrowIndex, e)}
-							class="pointer-events-auto cursor-pointer"
-						>
-							<path d={path.arrowHead} class="arrowhead-outline" />
-							<path d={path.line} class="arrow-outline" />
-							<path d={path.line} class="arrow-body" />
-							<path d={path.arrowHead} class="arrowhead-body" />
-						</g>
+						{@const colors = getArrowColorOrDefault(arrow)}
+						<SingleArrow
+							{path}
+							onClick={(e) => handleArrowClick(groupIndex * 100 + arrowIndex, e)}
+							--body-color={colors.bodyColor}
+							--outline-color={colors.outlineColor}
+						/>
 					{/each}
 				{/each}
 			{/each}
 		</svg>
 	</div>
 {/key}
-
-<style>
-	.arrow-body {
-		stroke: var(--color-bg-300);
-		stroke-width: 8;
-		fill: none;
-		stroke-linecap: square;
-	}
-
-	.arrow-outline {
-		stroke: var(--color-bg-400);
-		stroke-width: 16;
-		fill: none;
-		stroke-linecap: square;
-	}
-
-	.arrowhead-body {
-		fill: var(--color-bg-300);
-		stroke: none;
-	}
-
-	.arrowhead-outline {
-		fill: var(--color-bg-400);
-		stroke: var(--color-bg-400);
-		stroke-width: 8;
-		stroke-linecap: butt;
-		stroke-linejoin: miter;
-	}
-</style>
